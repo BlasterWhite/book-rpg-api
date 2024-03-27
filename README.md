@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a simple API for a book RPG game. 
+This is a simple API for a book RPG game. It's a RESTful API connected to a PostgreSQL database.
 
 Table of contents:
 
