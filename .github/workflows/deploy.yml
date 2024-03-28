@@ -23,7 +23,12 @@ jobs:
           script: |
             cd /var/www/book-rpg-api/
             git pull origin main
-            git status
+            git status            
+            export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
+            export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            export POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            export API_PORT=${{ secrets.API_PORT }}
+            echo $POSTGRES_PASSWORD
             docker compose down
             docker compose up -d
