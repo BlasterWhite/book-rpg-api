@@ -16,6 +16,8 @@ services:
   postgres:
     image: bigpapoo/r5a05-postgres
     container_name: book-rpg-postgres
+    volumes:
+      - book_postgres_data:/var/lib/postgresql/data
     ports:
       - ${POSTGRES_PORT}:5432
     environment:
@@ -23,3 +25,6 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     restart: always
+
+volumes:
+  book_postgres_data:
