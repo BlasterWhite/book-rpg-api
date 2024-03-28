@@ -27,4 +27,4 @@ services:
     restart: always
 
 volumes:
-  book_postgres_data:
+  postgres_data:
