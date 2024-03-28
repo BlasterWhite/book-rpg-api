@@ -24,5 +24,6 @@ jobs:
             cd /var/www/book-rpg-api/
             git pull origin main
             git status
+            export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             docker compose down
             docker compose up -d
