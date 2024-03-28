@@ -24,8 +24,5 @@ jobs:
             cd /var/www/book-rpg-api/
             git pull origin main
             git status
-            docker container stop book-rpg-api
-            docker container rm book-rpg-api
-            docker image rm book-rpg-api
-            docker build -t book-rpg-api .
-            docker run -d --name book-rpg-api -p 3000:3000 book-rpg-api
+            docker compose down
+            docker compose up -d
