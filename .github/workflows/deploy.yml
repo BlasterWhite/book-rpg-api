@@ -29,6 +29,6 @@ jobs:
             export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             export POSTGRES_DB=${{ secrets.POSTGRES_DB }}
             export API_PORT=${{ secrets.API_PORT }}
-            echo $POSTGRES_PASSWORD
+            printenv | grep POSTGRES
             docker compose down
             docker compose up -d
