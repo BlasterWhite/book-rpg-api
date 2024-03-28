@@ -30,6 +30,6 @@ jobs:
             export POSTGRES_DB=${{ secrets.POSTGRES_DB }}
             export API_PORT=${{ secrets.API_PORT }}
             printenv | grep POSTGRES
-            docker image rm book-rpg-api-api
             docker compose down
+            docker image rm book-rpg-api-api
             docker compose up -d
