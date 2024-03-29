@@ -2,19 +2,33 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../db/db");
 
 const User = sequelize.define(
-  "User",
+  "utilisateur",
   {
-    username: {
+    mail: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    birthday: {
-      type: DataTypes.DATE,
+    nom: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    prenom: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    mot_de_passe: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
   {
-    tableName: "User", // This is necessary because Sequelize by default takes the table name as the plural of the model name
+    schema: 'bookrpg',
+    tableName: "utilisateur", // This is necessary because Sequelize by default takes the table name as the plural of the model name
+    defaultScope: {
+      attributes: {
+        exclude: ['mot_de_passe']
+      }
+    }
   },
 );
 

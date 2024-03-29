@@ -8,6 +8,11 @@ const env = {
 };
 const sequelize = new Sequelize(
   `postgres://${env.user}:${env.password}@${env.host}:${env.port}/${env.database}`,
+  {
+    define: {
+      timestamps: false,
+    }
+  }
 );
 
 // Test the connection
