@@ -2,8 +2,8 @@ const User = require("../models/userModels");
 
 exports.createUser = async (req, res) => {
   try {
-    const { username, birthday } = req.body;
-    const user = await User.create({ username, birthday }); // INSERT INTO User (username, birthday) VALUES ('username',
+    const { mail, nom, prenom, mot_de_passe } = req.body;
+    const user = await User.create({ mail, nom, prenom, mot_de_passe }); // INSERT INTO User (username, birthday) VALUES ('username',
     res.status(201).json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -13,7 +13,7 @@ exports.createUser = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({
-      attributes: ["username", "birthday"],
+      attributes: ["mail", "nom", "prenom"],
     }); // SELECT username, birthday FROM User;
     res.status(200).json(users);
   } catch (error) {
@@ -34,9 +34,9 @@ exports.getUserById = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, birthday } = req.body;
+    const { mail, nom, prenom, mot_de_passe } = req.body;
     await User.update(
-      { username, birthday },
+      { mail, nom, prenom, mot_de_passe },
       {
         where: {
           id,
