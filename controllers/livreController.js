@@ -13,7 +13,7 @@ exports.createLivre = async (req, res) => {
   exports.getAllLivres = async (req, res) => {
     try {
       const livres = await Livre.findAll({
-        attributes: ["titre", "resume", "id_image", "tag", "date_sortie"],
+        attributes: ["id", "titre", "resume", "id_image", "tag", "date_sortie"],
       });
       res.status(200).json(livres);
     } catch (error) {
