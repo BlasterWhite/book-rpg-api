@@ -52,7 +52,7 @@ SectionModels.hasOne(Livre, {
 Livre.belongsTo(SectionModels);
 
 SectionModels.belongsToMany(SectionModels, {
-  through: "Association_liaison_section",
+  through: "association_liaison_section",
   foreignKey: "id_section_source",
   as: "sections",
   otherKey: "id_section_destination",
