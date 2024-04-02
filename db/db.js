@@ -1,18 +1,18 @@
 const { Sequelize } = require("sequelize");
 const env = {
-  host: "193.168.146.103",
-  port: 5432,
-  user: "postgres",
-  password: "7tbz4M8pgC5nEn2bkEBkptokV4DmgC",
-  database: "postgres",
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
 };
 const sequelize = new Sequelize(
   `postgres://${env.user}:${env.password}@${env.host}:${env.port}/${env.database}`,
   {
     define: {
       timestamps: false,
-    }
-  }
+    },
+  },
 );
 
 // Test the connection
