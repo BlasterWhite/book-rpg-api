@@ -3,6 +3,7 @@ const livreController = require("../controllers/livreController");
 
 const router = express.Router();
 
+router.get("/news", livreController.getAllNewLivres);
 router.get("/", livreController.getAllLivres);
 router.get("/:id", livreController.getLivreById);
 router.post("/", livreController.createLivre);

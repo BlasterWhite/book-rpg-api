@@ -62,3 +62,16 @@ exports.createLivre = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+exports.getAllNewLivres = async (req, res) => {
+  try {
+    const livres = await Livre.findAll({
+      attributes: ["titre", "resume", "id_image", "tag", "date_sortie"],
+      order: [['date_sortie', 'DESC']],
+      limit: 10,
+    });
+    res.status(200).json(livres);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
