@@ -2,7 +2,6 @@ version: '3.1'
 
 services:
   api:
-    image: api
     container_name: book-rpg-api
     build:
       context: ./
