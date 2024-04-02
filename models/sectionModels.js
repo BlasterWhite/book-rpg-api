@@ -46,12 +46,6 @@ Section.hasOne(Image, {
 });
 Image.belongsTo(Section);
 
-Section.hasOne(Livre, {
-  foreignKey: "id_livre",
-  as: "livres",
-});
-Livre.belongsTo(Section);
-
 Section.belongsToMany(Section, {
   through: "association_liaison_section",
   foreignKey: "id_section_source",
