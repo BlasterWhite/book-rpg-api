@@ -1,9 +1,11 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../db/db");
+
 const Armes = require("./armeModels");
+const Image = require("./imageModels");
 const Equipement = require("./equipementModels");
 
-const PersonnageModels = sequelize.define(
+const Personnage = sequelize.define(
   "personnage",
   {
     nom: {
@@ -17,6 +19,10 @@ const PersonnageModels = sequelize.define(
     id_image: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: Image, // This is a reference to another model
+        key: "id",
+      },
     },
     occupation: {
       type: DataTypes.STRING,
@@ -58,21 +64,77 @@ const PersonnageModels = sequelize.define(
   },
 );
 
-PersonnageModels.belongsToMany(Armes, {
-  through: "association_arme_personnage",
+const AssociationArmePersonnage = sequelize.define(
+  "association_arme_personnage",
+  {
+    id_personnage: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Personnage,
+        key: "id",
+      },
+    },
+    id_arme: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Armes,
+        key: "id",
+      },
+    },
+  },
+  {
+    schema: "bookrpg",
+    tableName: "association_arme_personnage",
+  },
+);
+
+const AssociationEquipementPersonnage = sequelize.define(
+  "association_equipement_personnage",
+  {
+    id_personnage: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Personnage,
+        key: "id",
+      },
+    },
+    id_equipement: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Equipement,
+        key: "id",
+      },
+    },
+  },
+  {
+    schema: "bookrpg",
+    tableName: "association_equipement_personnage",
+  },
+);
+
+Personnage.belongsToMany(Armes, {
+  through: AssociationArmePersonnage,
+  foreignKey: "id_personnage",
 });
-Armes.belongsToMany(PersonnageModels, {
-  through: "association_arme_personnage",
+Armes.belongsToMany(Personnage, {
+  through: AssociationArmePersonnage,
+  foreignKey: "id_arme",
 });
 
-PersonnageModels.belongsToMany(Equipement, {
-  through: "association_equipement_personnage",
+Personnage.belongsToMany(Equipement, {
+  through: AssociationEquipementPersonnage,
+  foreignKey: "id_personnage",
 });
-Equipement.belongsToMany(PersonnageModels, {
-  through: "association_equipement_personnage",
+Equipement.belongsToMany(Personnage, {
+  through: AssociationEquipementPersonnage,
+  foreignKey: "id_equipement",
 });
 
-PersonnageModels.getAttributes = () => {
+Personnage.getAttributes = () => {
   return [
     "nom",
     "description",
@@ -87,4 +149,8 @@ PersonnageModels.getAttributes = () => {
   ];
 };
 
-module.exports = PersonnageModels;
+module.exports = {
+  Personnage,
+  AssociationArmePersonnage,
+  AssociationEquipementPersonnage,
+};
