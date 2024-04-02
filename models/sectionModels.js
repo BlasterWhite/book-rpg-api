@@ -40,6 +40,33 @@ const Section = sequelize.define(
   },
 );
 
+const Destination = sequelize.define(
+  "destination",
+  {
+    id_section: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Section,
+        key: "id",
+      },
+    },
+    id_section_destination: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  },
+  {
+    schema: "bookrpg",
+    tableName: "destination", // This is necessary because Sequelize by default takes the table name as the plural of the model name
+    defaultScope: {
+      attributes: {
+        exclude: [],
+      },
+    },
+  },
+);
+
 Section.hasOne(Image, {
   foreignKey: "id_image",
   as: "images",
@@ -57,4 +84,4 @@ Section.getAttributes = () => {
   return ["id", "id_livre", "numero_section", "texte", "id_image", "type"];
 };
 
-module.exports = Section;
+module.exports = {Section, Destination};
