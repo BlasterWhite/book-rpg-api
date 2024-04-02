@@ -1,3 +1,4 @@
+const Resultat = require("../models/resultatModels");
 const Section = require("../models/sectionModels");
 
 exports.createSection = async (req, res) => {
@@ -25,11 +26,19 @@ exports.getSectionById = async (req, res) => {
     try {
       const { id } = req.params;
       const section = await Section.findByPk(id, {
-        include: [{
+        include: [
+          {
+            model: Resultat,
+            as: 'resultats',
+          },
+          {
             model: Section,
+            as: 'sections',
             through: 'association_liaison_section',
-            as: 'sections'
-        }]});
+            foreignKey: 'id_section_source',
+            otherKey: 'id_section_destination',
+          }
+        ]});
       res.status(200).json(section);
     } catch (error) {
       res.status(500).json({ error: error.message });
