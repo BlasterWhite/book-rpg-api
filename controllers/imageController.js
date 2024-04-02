@@ -20,8 +20,44 @@ exports.getOneImage = async (req, res) => {
 
 exports.createImage = async (req, res) => {
   try {
-    const image = await Image.create(req.body);
-    res.json(image);
+    if (!req.body.prompt) {
+      return res.status(400).json({ error: "Please provide a prompt" });
+    }
+
+    fetch("https://api.getimg.ai/v1/essential/text-to-image", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        authorization: `Bearer ${process.env.KEY}`,
+      },
+      body: JSON.stringify({
+        prompt: req.body.prompt.toString(),
+      }),
+    })
+      .then((response) => response.json())
+      .then(async (response) => {
+        if (response.error) {
+          return res.status(400).json({ error: response.error });
+        }
+        console.log(response.image);
+        const image = await Image.create({ image: response.image });
+        res.status(201).json(image);
+      })
+      .catch((err) => res.status(500).json({ error: err.message }));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.createImageB64 = async (req, res) => {
+  try {
+    if (!req.body.image) {
+      return res.status(400).json({ error: "Please provide an image" });
+    }
+
+    const image = await Image.create({ image: req.body.image });
+    res.status(201).json(image);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
