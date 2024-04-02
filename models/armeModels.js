@@ -1,10 +1,11 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../db/db");
+const Image = require("./imageModels");
 
 const Arme = sequelize.define(
   "arme",
   {
-    nom: {
+    titre: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -15,12 +16,16 @@ const Arme = sequelize.define(
     id_image: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: Image, // This is a reference to another model
+        key: "id",
+      },
     },
     degats: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    resistance: {
+    durabilite: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -35,12 +40,6 @@ const Arme = sequelize.define(
     },
   },
 );
-
-Arme.hasOne(Image, {
-  foreignKey: "id_image",
-  as: "images",
-});
-Image.belongsTo(Arme);
 
 Arme.getAttributes = () => {
   return ["id", "nom", "description", "id_image", "degats"];
