@@ -23,6 +23,10 @@ const Section = sequelize.define(
     id_image: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: Image,
+        key: "id",
+      },
     },
     type: {
       type: DataTypes.STRING,
@@ -40,11 +44,11 @@ const Section = sequelize.define(
   },
 );
 
-Section.hasOne(Image, {
-  foreignKey: "id_image",
-  as: "images",
-});
-Image.belongsTo(Section);
+// SectionModels.hasOne(Image, {
+//   foreignKey: "id_image",
+//   as: "images",
+// });
+// Image.belongsTo(SectionModels);
 
 Section.hasOne(Livre, {
   foreignKey: "id_livre",
