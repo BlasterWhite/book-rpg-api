@@ -3,8 +3,9 @@ const sequelize = require("../db/db");
 
 const Image = require("./imageModels");
 const Livre = require("./livreModels");
+const Resultat = require("./resultatModels");
 
-const SectionModels = sequelize.define(
+const Section = sequelize.define(
   "section",
   {
     id_livre: {
@@ -22,6 +23,10 @@ const SectionModels = sequelize.define(
     id_image: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: Image,
+        key: "id",
+      },
     },
     type: {
       type: DataTypes.STRING,
@@ -39,27 +44,27 @@ const SectionModels = sequelize.define(
   },
 );
 
-SectionModels.hasOne(Image, {
-  foreignKey: "id_image",
-  as: "images",
-});
-Image.belongsTo(SectionModels);
+// SectionModels.hasOne(Image, {
+//   foreignKey: "id_image",
+//   as: "images",
+// });
+// Image.belongsTo(SectionModels);
 
-SectionModels.hasOne(Livre, {
+Section.hasOne(Livre, {
   foreignKey: "id_livre",
   as: "livres",
 });
-Livre.belongsTo(SectionModels);
+Livre.belongsTo(Section);
 
-SectionModels.belongsToMany(SectionModels, {
+Section.belongsToMany(Section, {
   through: "association_liaison_section",
   foreignKey: "id_section_source",
   as: "sections",
   otherKey: "id_section_destination",
 });
 
-SectionModels.getAttributes = () => {
+Section.getAttributes = () => {
   return ["id", "id_livre", "numero_section", "texte", "id_image", "type"];
 };
 
-module.exports = SectionModels;
+module.exports = Section;
