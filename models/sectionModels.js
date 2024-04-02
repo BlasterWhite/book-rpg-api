@@ -56,6 +56,11 @@ Section.hasOne(Livre, {
 });
 Livre.belongsTo(Section);
 
+Section.hasOne(Resultat, {
+  foreignKey: "id_section",
+  as: "resultats",
+});
+
 Section.belongsToMany(Section, {
   through: "association_liaison_section",
   foreignKey: "id_section_source",

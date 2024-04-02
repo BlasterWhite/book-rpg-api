@@ -3,6 +3,7 @@ const sequelize = require("../db/db");
 const { Personnage } = require("./personnageModels");
 const User = require("./userModels");
 const Livre = require("./livreModels");
+const Section = require("./sectionModels");
 
 const Aventure = sequelize.define(
   "aventure",
