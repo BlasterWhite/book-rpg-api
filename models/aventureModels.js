@@ -57,16 +57,16 @@ const Aventure = sequelize.define(
 );
 
 Aventure.belongsTo(User, {
-    foreignKey: "id_utilisateur",
+    foreignKey: "id",
 });
 Aventure.belongsTo(Livre, {
-    foreignKey: "id_livre",
+    foreignKey: "id",
 });
 Aventure.belongsTo(Section, {
-    foreignKey: "id_section_actuelle",
+    foreignKey: "id",
 });
 Aventure.belongsTo(Personnage, {
-    foreignKey: "id_personnage",
+    foreignKey: "id",
 });
 
 Aventure.hasOne(Section, {

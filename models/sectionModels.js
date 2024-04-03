@@ -1,4 +1,4 @@
-const { DataTypes } = require("sequelize");
+const {DataTypes} = require("sequelize");
 const sequelize = require("../db/db");
 
 const Image = require("./imageModels");
@@ -6,42 +6,42 @@ const Livre = require("./livreModels");
 const Resultat = require("./resultatModels");
 
 const Section = sequelize.define(
-  "section",
-  {
-    id_livre: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    "section",
+    {
+        id_livre: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        numero_section: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        texte: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        id_image: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: Image,
+                key: "id",
+            },
+        },
+        type: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
     },
-    numero_section: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    {
+        schema: "bookrpg",
+        tableName: "section", // This is necessary because Sequelize by default takes the table name as the plural of the model name
+        defaultScope: {
+            attributes: {
+                exclude: [],
+            },
+        },
     },
-    texte: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    id_image: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Image,
-        key: "id",
-      },
-    },
-    type: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    schema: "bookrpg",
-    tableName: "section", // This is necessary because Sequelize by default takes the table name as the plural of the model name
-    defaultScope: {
-      attributes: {
-        exclude: [],
-      },
-    },
-  },
 );
 
 const AssociationLiaisonSection = sequelize.define(
@@ -115,21 +115,24 @@ Section.hasOne(Image, {
 Image.belongsTo(Section);
 
 Section.hasOne(Livre, {
-  foreignKey: "id_livre",
-  as: "livres",
+    foreignKey: "id",
+    sourceKey: "id",
 });
-Livre.belongsTo(Section);
+Livre.belongsTo(Section, {
+    foreignKey: "id",
+    targetKey: "id_livre",
+});
 
 Section.hasOne(Resultat, {
-  foreignKey: "id_section",
-  as: "resultats",
+    foreignKey: "id_section",
+    sourceKey: "id",
 });
 
 Section.belongsToMany(Section, {
-  through: "association_liaison_section",
-  foreignKey: "id_section_source",
-  as: "sections",
-  otherKey: "id_section_destination",
+    through: "association_liaison_section",
+    foreignKey: "id_section_source",
+    as: "sections",
+    otherKey: "id_section_destination",
 });
 // Section.belongsToMany(Section, {
 //   through: "association_liaison_section",
@@ -149,7 +152,7 @@ Section.belongsToMany(Section, {
 
 
 Section.getAttributes = () => {
-  return ["id", "id_livre", "numero_section", "texte", "id_image", "type"];
+    return ["id", "id_livre", "numero_section", "texte", "id_image", "type"];
 };
 
 module.exports = Section;
