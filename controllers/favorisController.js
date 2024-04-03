@@ -54,9 +54,13 @@ exports.updateFavoris = async (req, res) => {
 
 exports.deleteFavoris = async (req, res) => {
   try {
-    const favoris = await Favoris.findByPk(req.params.id);
-    await favoris.destroy();
-    res.json({ message: `Favoris ${req.params.id} deleted` });
+    await Favoris.destroy({
+      where: {
+        id_utilisateur: req.params.idUser,
+        id_livre: req.params.idLivre,
+      },
+    });
+    res.json({ message: `Favoris for book ${req.params.idLivre} deleted` });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
