@@ -125,6 +125,11 @@ exports.createSection = async (req, res) => {
         section.addSections(search);
       }
     }
+    
+    await transaction.commit();
+
+    transaction = await sequelize.transaction();
+
     const sectionInseree = await Section.findOne({
       where: {
         id_livre: idLivre,
