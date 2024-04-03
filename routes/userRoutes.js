@@ -17,6 +17,6 @@ router.get("/:idUser/favoris", favorisController.getAllFavoris);
 router.get("/:idUser/favoris/:idLivre", favorisController.getFavorisByLivre);
 router.post("/:idUser/favoris", favorisController.createFavoris);
 router.put("/:idUser/favoris/:id", favorisController.updateFavoris);
-router.delete("/:idUser/favoris/:id", favorisController.deleteFavoris);
+router.delete("/:idUser/favoris/:idLivre", favorisController.deleteFavoris);
 
 module.exports = router;
