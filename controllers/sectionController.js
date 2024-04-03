@@ -20,7 +20,7 @@ exports.createSection = async (req, res) => {
         include: [
           {
             model: Resultat,
-            as: "resultats"
+            as: "resultat"
           }
         ],
         transaction
@@ -141,7 +141,7 @@ exports.createSection = async (req, res) => {
       include: [
         {
           model: Resultat,
-          as: "resultats"
+          as: "resultat"
         },
         {
           model: Section,
@@ -175,6 +175,7 @@ exports.getAllSections = async (req, res) => {
       include: [
         {
           model: Resultat,
+          as: "resultat"
         },
         {
           model: Section,
@@ -202,6 +203,7 @@ exports.getSectionById = async (req, res) => {
       include: [
         {
           model: Resultat,
+          as: "resultat"
         },
         {
           model: Section,
@@ -232,6 +234,7 @@ exports.updateSection = async (req, res) => {
       include: [
         {
           model: Resultat,
+          as: "resultat"
         },
         {
           model: Section,
@@ -276,6 +279,7 @@ exports.deleteSection = async (req, res) => {
       include: [
         {
           model: Resultat,
+          as: "resultat"
         },
         {
           model: Section,
