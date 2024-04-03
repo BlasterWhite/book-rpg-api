@@ -240,7 +240,9 @@ exports.getAllSections = async (req, res) => {
     });
     sections.forEach((section) => {
       if (section.resultat) {
-        section.resultat.condition = JSON.parse(section.resultat.condition);
+        if (section.resultat.type_condition === "JSON") {
+          section.resultat.condition = JSON.parse(section.resultat.condition);
+        }
       }
     });
     res.status(200).json(sections);
@@ -272,7 +274,9 @@ exports.getSectionById = async (req, res) => {
       ],
     });
     if (section.resultat) {
-      section.resultat.condition = JSON.parse(section.resultat.condition);
+      if (section.resultat.type_condition === "JSON") {
+        section.resultat.condition = JSON.parse(section.resultat.condition);
+      }
     }
     res.status(200).json(section);
   } catch (error) {
