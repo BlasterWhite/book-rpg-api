@@ -290,7 +290,7 @@ exports.updateSection = async (req, res) => {
     });
 
     if (Array.isArray(destinations)) {
-      if (!(destinations.length > 0)) {
+      if (destinations.length > 0) {
         await updatedSection.removeSections();
 
         for (const destination of destinations) {
@@ -390,7 +390,7 @@ exports.updateSection = async (req, res) => {
           res.status(400).json({ error: "Type choix must not have resultat" });
         }
 
-        if (resultat.type_condition !== "integer") {
+        if (typeof resultat.type_condition !== "number") {
           res.status(400).json({ error: "Type condition must be integer" });
           return;
         }
