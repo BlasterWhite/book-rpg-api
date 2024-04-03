@@ -291,8 +291,8 @@ exports.updateSection = async (req, res) => {
 
     if (Array.isArray(destinations)) {
       if (destinations.length > 0) {
-        const nbDestinations = updatedSection.getSections().length;
-        if (nbDestinations > 0) {
+        const nbDestinations = await updatedSection.getSections();
+        if (nbDestinations.length > 0) {
           await updatedSection.setSections(null);
         }
 
