@@ -20,10 +20,18 @@ const Resultat = sequelize.define(
       gagne: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: Section,
+          key: "id"
+        }
       },
       perd: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: Section,
+          key: "id"
+        }
       },
     },
     {
