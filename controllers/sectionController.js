@@ -222,8 +222,26 @@ exports.updateSection = async (req, res) => {
     transaction = await sequelize.transaction();
     const { idLivre, idSection } = req.params;
     const { numero_section, texte, id_image, type } = req.body;
-
-    const sectionEnBase = Section.findByPk(idSection);
+    
+    const sectionEnBase = await Section.findOne({
+      where: {
+        id_livre: idLivre,
+        id: idSection
+      },
+      include: [
+        {
+          model: Resultat,
+          as: 'resultats',
+        },
+        {
+          model: Section,
+          as: 'sections',
+          through: 'association_liaison_section',
+          foreignKey: 'id_section_source',
+          otherKey: 'id_section_destination',
+        }
+      ]
+    });
 
     await Section.update(
       { id_livre: Number(idLivre), numero_section, texte, id_image, type },
