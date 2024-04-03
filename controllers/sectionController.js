@@ -291,7 +291,7 @@ exports.updateSection = async (req, res) => {
 
     if (Array.isArray(destinations)) {
       if (destinations.length > 0) {
-        await updatedSection.removeSections();
+        await updatedSection.setSections(null);
 
         for (const destination of destinations) {
           const search = await Section.findOne({
@@ -434,7 +434,7 @@ exports.updateSection = async (req, res) => {
 
         break;
       case "termine":
-        await updatedSection.removeSections();
+        await updatedSection.setSections(null);
         await updatedSection.setResultat(null);
         break;
     }
