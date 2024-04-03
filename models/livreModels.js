@@ -43,10 +43,14 @@ const Livre = sequelize.define(
 );
 
 Livre.belongsTo(Image, {
-    foreignKey: "id",
+    foreignKey: "id_image",
+    targetKey: "id",
+    as: "image",
 });
 Image.hasOne(Livre, {
     foreignKey: "id_image",
+    sourceKey: "id",
+    as: "livre",
 });
 
 module.exports = Livre;
