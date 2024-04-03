@@ -91,7 +91,7 @@ Livre.belongsTo(Section);
 
 Section.hasOne(Resultat, {
   foreignKey: "id_section",
-  as: "resultats",
+  as: "resultat",
 });
 
 Section.getAttributes = () => {
