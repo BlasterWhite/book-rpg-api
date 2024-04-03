@@ -20,7 +20,7 @@ exports.createSection = async (req, res) => {
         include: [
           {
             model: Resultat,
-            as: 'resultats'
+            as: "resultats"
           }
         ],
         transaction
@@ -29,7 +29,7 @@ exports.createSection = async (req, res) => {
 
     if(type === "none" || type === "termine") {
       if(destinations && Array.isArray(destinations) && destinations.length > 0) {
-        res.status(400).json({error: "Section type does not correspond to number of destination 1"});
+        res.status(400).json({error: "Section type does not correspond to number of destination"});
         return;
       }
     } else if(type === "des" || type === "combat" || type === "enigme") {
@@ -44,7 +44,7 @@ exports.createSection = async (req, res) => {
       }
 
       if(destinations && Array.isArray(destinations) && destinations.length != 2) {
-        res.status(400).json({error: "Section type does not correspond to number of destination 2"});
+        res.status(400).json({error: "Section type does not correspond to number of destination"});
         return;
       }
 
@@ -102,7 +102,7 @@ exports.createSection = async (req, res) => {
       }
       
       if(destinations && Array.isArray(destinations) && destinations.length == 0) {
-        res.status(400).json({error: "Section type does not correspond to number of destination 3"});
+        res.status(400).json({error: "Section type does not correspond to number of destination"});
         return;
       }
       
@@ -124,6 +124,9 @@ exports.createSection = async (req, res) => {
         }
         section.addSections(search);
       }
+    } else {
+      res.status(400).json({error: "Wrong type"});
+      return;
     }
     
     await transaction.commit();
@@ -138,7 +141,7 @@ exports.createSection = async (req, res) => {
       include: [
         {
           model: Resultat,
-          as: 'resultats',
+          as: "resultats"
         },
         {
           model: Section,
@@ -229,7 +232,6 @@ exports.updateSection = async (req, res) => {
       include: [
         {
           model: Resultat,
-          as: 'resultats',
         },
         {
           model: Section,
@@ -274,7 +276,6 @@ exports.deleteSection = async (req, res) => {
       include: [
         {
           model: Resultat,
-          as: 'resultats',
         },
         {
           model: Section,

@@ -98,6 +98,7 @@ Livre.belongsTo(Section, {
 Section.hasOne(Resultat, {
     foreignKey: "id_section",
     sourceKey: "id",
+    as: "resultat",
 });
 
 Section.getAttributes = () => {
