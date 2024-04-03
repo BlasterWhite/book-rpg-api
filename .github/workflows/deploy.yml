@@ -24,6 +24,7 @@ jobs:
             cd /var/www/book-rpg-api/
             git pull origin main
             git status            
+            export POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
             export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
             export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
@@ -31,4 +32,5 @@ jobs:
             export API_PORT=${{ secrets.API_PORT }}
             printenv | grep POSTGRES
             docker compose down
+            docker image rm book-rpg-api-api
             docker compose up -d
