@@ -44,11 +44,75 @@ const Section = sequelize.define(
   },
 );
 
-// SectionModels.hasOne(Image, {
-//   foreignKey: "id_image",
-//   as: "images",
-// });
-// Image.belongsTo(SectionModels);
+const AssociationLiaisonSection = sequelize.define(
+  "association_liaison_section",
+  {
+      id_section_source: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+              model: Section,
+              key: "id",
+          },
+      },
+      id_section_destination: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+              model: Section,
+              key: "id",
+          },
+      },
+  },
+  {
+      schema: "bookrpg",
+      tableName: "association_liaison_section"
+  }
+);
+
+Section.belongsToMany(Section, {
+  through: AssociationLiaisonSection,
+  as: "sections",
+  foreignKey: "id_section_source",
+  otherKey: "id_section_destination",
+});
+
+// const Destination = sequelize.define(
+//   "destination",
+//   {
+//     id_section: {
+//       type: DataTypes.INTEGER,
+//       allowNull: false,
+//       references: {
+//         model: Section,
+//         key: "id",
+//       },
+//     },
+//     id_section_destination: {
+//       type: DataTypes.INTEGER,
+//       allowNull: false,
+//       references: {
+//         model: Section,
+//         key: "id"
+//       }
+//     },
+//   },
+//   {
+//     schema: "bookrpg",
+//     tableName: "destination", // This is necessary because Sequelize by default takes the table name as the plural of the model name
+//     defaultScope: {
+//       attributes: {
+//         exclude: [],
+//       },
+//     },
+//   },
+// );
+
+Section.hasOne(Image, {
+  foreignKey: "id_image",
+  as: "images",
+});
+Image.belongsTo(Section);
 
 Section.hasOne(Livre, {
   foreignKey: "id_livre",
@@ -67,9 +131,26 @@ Section.belongsToMany(Section, {
   as: "sections",
   otherKey: "id_section_destination",
 });
+// Section.belongsToMany(Section, {
+//   through: "association_liaison_section",
+//   foreignKey: "id_section_source",
+//   as: "sections",
+//   otherKey: "id_section_destination",
+// });
+
+// Section.hasMany(Destination, {
+//   foreignKey: "id_section",
+//   as: "destination",
+// });
+
+// Destination.belongsTo(Section, {
+
+// })
+
 
 Section.getAttributes = () => {
   return ["id", "id_livre", "numero_section", "texte", "id_image", "type"];
 };
 
 module.exports = Section;
+//module.exports = {Section, Destination};
