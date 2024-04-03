@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../db/db");
-const Section = require("./sectionModels");
 
 const Resultat = sequelize.define(
     "resultat",
@@ -45,13 +44,8 @@ const Resultat = sequelize.define(
     },
 );
 
-Section.hasOne(Resultat, {
-  foreignKey: "id_section",
-  as: "resultats",
-});
-
 Resultat.getAttributes = () => {
-return ["id", "id_section", "condition", "type_condition", "gagne", "perd"];
+  return ["id", "id_section", "condition", "type_condition", "gagne", "perd"];
 };
 
 module.exports = Resultat;

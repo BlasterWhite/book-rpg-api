@@ -1,4 +1,5 @@
 const User = require("../models/userModels");
+const Aventure = require("../models/aventureModels");
 
 exports.createUser = async (req, res) => {
   try {
@@ -58,6 +59,35 @@ exports.deleteUser = async (req, res) => {
       },
     }); // DELETE FROM User WHERE id = id;
     res.status(200).json({ message: "User deleted" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getAllAventures = async (req, res) => {
+  try {
+    const { idUser } = req.params;
+    const aventures = await Aventure.findAll({
+      where: {
+        id_utilisateur: idUser,
+      },
+    }); // SELECT * FROM Aventure WHERE id_user = idUser;
+    res.status(200).json(aventures);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getAventureById = async (req, res) => {
+  try {
+    const { idUser, idAventure } = req.params;
+    const aventure = await Aventure.findOne({
+      where: {
+        id: idAventure,
+        id_utilisateur: idUser,
+      },
+    }); // SELECT * FROM Aventure WHERE id = idAventure AND id_user = idUser;
+    res.status(200).json(aventure);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
