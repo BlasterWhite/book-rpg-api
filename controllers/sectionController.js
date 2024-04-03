@@ -291,7 +291,10 @@ exports.updateSection = async (req, res) => {
 
     if (Array.isArray(destinations)) {
       if (destinations.length > 0) {
-        await updatedSection.setSections(null);
+        const nbDestinations = updatedSection.getSections().length;
+        if (nbDestinations > 0) {
+          await updatedSection.setSections(null);
+        }
 
         for (const destination of destinations) {
           const search = await Section.findOne({
