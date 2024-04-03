@@ -154,7 +154,6 @@ exports.createSection = async (req, res) => {
     await transaction.commit();
     res.status(201).json({message: sectionInseree});
   } catch (error) {
-    console.error(error);
     if(transaction) {
       await transaction.rollback();
     }
@@ -218,9 +217,32 @@ exports.getSectionById = async (req, res) => {
 };
 
 exports.updateSection = async (req, res) => {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { idLivre, idSection } = req.params;
     const { numero_section, texte, id_image, type } = req.body;
+    
+    const sectionEnBase = await Section.findOne({
+      where: {
+        id_livre: idLivre,
+        id: idSection
+      },
+      include: [
+        {
+          model: Resultat,
+          as: 'resultats',
+        },
+        {
+          model: Section,
+          as: 'sections',
+          through: 'association_liaison_section',
+          foreignKey: 'id_section_source',
+          otherKey: 'id_section_destination',
+        }
+      ]
+    });
+
     await Section.update(
       { id_livre: Number(idLivre), numero_section, texte, id_image, type },
       {
@@ -230,23 +252,49 @@ exports.updateSection = async (req, res) => {
         },
       },
     );
+    await transaction.commit();
     res.status(200).json({ message: "Section updated" });
   } catch (error) {
+    if(transaction) {
+      await transaction.rollback();
+    }
     res.status(500).json({ error: error.message });
   }
 };
   
 exports.deleteSection = async (req, res) => {
+  let transaction;
   try {
-      const { idLivre, idSection } = req.params;
-      await Section.destroy({
+    transaction = await sequelize.transaction();
+    const { idLivre, idSection } = req.params;
+    
+    await Section.destroy({
       where: {
           id_livre: idLivre,
           id: idSection
       },
-      });
-      res.status(200).json({ message: "Section deleted" });
+      include: [
+        {
+          model: Resultat,
+          as: 'resultats',
+        },
+        {
+          model: Section,
+          as: 'sections',
+          through: 'association_liaison_section',
+          foreignKey: 'id_section_source',
+          otherKey: 'id_section_destination',
+        }
+      ],
+      transaction
+    });
+    
+    await transaction.commit();
+    res.status(200).json({ message: "Section deleted" });
   } catch (error) {
+      if(transaction) {
+        await transaction.rollback();
+      }
       res.status(500).json({ error: error.message });
   }
 };
