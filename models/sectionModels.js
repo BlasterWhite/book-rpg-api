@@ -84,18 +84,21 @@ Section.hasOne(Image, {
 Image.belongsTo(Section);
 
 Section.hasOne(Livre, {
-  foreignKey: "id_livre",
-  as: "livres",
+    foreignKey: "id",
+    sourceKey: "id",
 });
-Livre.belongsTo(Section);
+Livre.belongsTo(Section, {
+    foreignKey: "id",
+    targetKey: "id_livre",
+});
 
 Section.hasOne(Resultat, {
-  foreignKey: "id_section",
-  as: "resultats",
+    foreignKey: "id_section",
+    sourceKey: "id",
 });
 
 Section.getAttributes = () => {
-  return ["id", "id_livre", "numero_section", "texte", "id_image", "type"];
+    return ["id", "id_livre", "numero_section", "texte", "id_image", "type"];
 };
 
 module.exports = Section;
