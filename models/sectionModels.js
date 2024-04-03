@@ -1,4 +1,4 @@
-const {DataTypes} = require("sequelize");
+const { DataTypes } = require("sequelize");
 const sequelize = require("../db/db");
 
 const Image = require("./imageModels");
@@ -6,42 +6,42 @@ const Livre = require("./livreModels");
 const Resultat = require("./resultatModels");
 
 const Section = sequelize.define(
-    "section",
-    {
-        id_livre: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        numero_section: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        texte: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        id_image: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-                model: Image,
-                key: "id",
-            },
-        },
-        type: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
+  "section",
+  {
+    id_livre: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
-    {
-        schema: "bookrpg",
-        tableName: "section", // This is necessary because Sequelize by default takes the table name as the plural of the model name
-        defaultScope: {
-            attributes: {
-                exclude: [],
-            },
-        },
+    numero_section: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
+    texte: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    id_image: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Image,
+        key: "id",
+      },
+    },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    schema: "bookrpg",
+    tableName: "section", // This is necessary because Sequelize by default takes the table name as the plural of the model name
+    defaultScope: {
+      attributes: {
+        exclude: [],
+      },
+    },
+  },
 );
 
 const AssociationLiaisonSection = sequelize.define(
@@ -77,37 +77,6 @@ Section.belongsToMany(Section, {
   otherKey: "id_section_destination",
 });
 
-// const Destination = sequelize.define(
-//   "destination",
-//   {
-//     id_section: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//       references: {
-//         model: Section,
-//         key: "id",
-//       },
-//     },
-//     id_section_destination: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//       references: {
-//         model: Section,
-//         key: "id"
-//       }
-//     },
-//   },
-//   {
-//     schema: "bookrpg",
-//     tableName: "destination", // This is necessary because Sequelize by default takes the table name as the plural of the model name
-//     defaultScope: {
-//       attributes: {
-//         exclude: [],
-//       },
-//     },
-//   },
-// );
-
 Section.hasOne(Image, {
   foreignKey: "id_image",
   as: "images",
@@ -128,32 +97,8 @@ Section.hasOne(Resultat, {
     sourceKey: "id",
 });
 
-Section.belongsToMany(Section, {
-    through: "association_liaison_section",
-    foreignKey: "id_section_source",
-    as: "sections",
-    otherKey: "id_section_destination",
-});
-// Section.belongsToMany(Section, {
-//   through: "association_liaison_section",
-//   foreignKey: "id_section_source",
-//   as: "sections",
-//   otherKey: "id_section_destination",
-// });
-
-// Section.hasMany(Destination, {
-//   foreignKey: "id_section",
-//   as: "destination",
-// });
-
-// Destination.belongsTo(Section, {
-
-// })
-
-
 Section.getAttributes = () => {
     return ["id", "id_livre", "numero_section", "texte", "id_image", "type"];
 };
 
 module.exports = Section;
-//module.exports = {Section, Destination};
