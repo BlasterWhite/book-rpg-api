@@ -311,7 +311,7 @@ exports.updateSection = async (req, res) => {
         }
       }
     }
-
+    let queryRes;
     switch (type) {
       case "none":
         res.status(400).json({ error: "Type none is not allowed for update" });
@@ -345,7 +345,10 @@ exports.updateSection = async (req, res) => {
           return;
         }
 
-        await updatedSection.setResultat(null);
+        queryRes = await updatedSection.getResultat(); // Trouvez le résultat associé
+        if (queryRes) {
+          await queryRes.destroy(); // Supprimez le résultat s'il existe
+        }
 
         resultat.id_section = updatedSection.id;
         await updatedSection.createResultat({
@@ -377,7 +380,10 @@ exports.updateSection = async (req, res) => {
           return;
         }
 
-        await updatedSection.setResultat(null);
+        queryRes = await updatedSection.getResultat(); // Trouvez le résultat associé
+        if (queryRes) {
+          await queryRes.destroy(); // Supprimez le résultat s'il existe
+        }
 
         resultat.id_section = updatedSection.id;
         await updatedSection.createResultat({
@@ -424,7 +430,10 @@ exports.updateSection = async (req, res) => {
           return;
         }
 
-        await updatedSection.setResultat(null);
+        queryRes = await updatedSection.getResultat();
+        if (queryRes) {
+          await queryRes.destroy();
+        }
 
         resultat.id_section = newSection.id;
         await updatedSection.createResultat({
