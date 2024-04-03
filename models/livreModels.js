@@ -2,6 +2,7 @@ const {DataTypes} = require("sequelize");
 const sequelize = require("../db/db");
 
 const Image = require("./imageModels");
+const {Personnage} = require("./personnageModels");
 
 const Livre = sequelize.define(
     "livre",
@@ -30,6 +31,14 @@ const Livre = sequelize.define(
             type: DataTypes.DATE,
             allowNull: false,
         },
+        id_personnage_default: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: Personnage, // This is a reference to another model
+                key: "id",
+            }
+        },
     },
     {
         schema: "bookrpg",
@@ -49,6 +58,18 @@ Livre.belongsTo(Image, {
 });
 Image.hasOne(Livre, {
     foreignKey: "id_image",
+    sourceKey: "id",
+    as: "livre",
+});
+
+Livre.belongsTo(Personnage, {
+    foreignKey: "id_personnage_default",
+    targetKey: "id",
+    as: "personnage_default",
+});
+
+Personnage.hasOne(Livre, {
+    foreignKey: "id_personnage_default",
     sourceKey: "id",
     as: "livre",
 });
