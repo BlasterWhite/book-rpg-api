@@ -9,10 +9,13 @@ exports.getAllFavoris = async (req, res) => {
   }
 };
 
-exports.getFavorisByUser = async (req, res) => {
+exports.getFavorisByLivre = async (req, res) => {
   try {
+    const { idLivre } = req.params;
     const favoris = await Favoris.findAll({
-      where: { id_utilisateur: req.params.id },
+      where: {
+        id_livre: idLivre,
+      },
     });
     res.json(favoris);
   } catch (error) {
@@ -22,7 +25,12 @@ exports.getFavorisByUser = async (req, res) => {
 
 exports.createFavoris = async (req, res) => {
   try {
-    const favoris = await Favoris.create(req.body);
+    const { idUser } = req.params;
+    const { id_livre } = req.body;
+    const favoris = await Favoris.create({
+      id_utilisateur: idUser,
+      id_livre: id_livre,
+    });
     res.status(201).json(favoris);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -31,8 +39,13 @@ exports.createFavoris = async (req, res) => {
 
 exports.updateFavoris = async (req, res) => {
   try {
+    const { idUser } = req.params;
+    const { id_livre } = req.body;
     const favoris = await Favoris.findByPk(req.params.id);
-    await favoris.update(req.body);
+    await favoris.update({
+      id_utilisateur: idUser,
+      id_livre,
+    });
     res.json(favoris);
   } catch (error) {
     res.status(500).json({ error: error.message });
