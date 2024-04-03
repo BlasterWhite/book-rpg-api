@@ -280,20 +280,18 @@ exports.updateSection = async (req, res) => {
     const { numero_section, texte, id_image, type, resultat, destinations } =
       req.body;
 
-    const newSection = await Section.update(
-      { numero_section, texte, id_image, type },
-      {
-        where: {
-          id_livre: idLivre,
-          id: idSection,
-        },
-        transaction,
+    const updatedSection = await Section.findOne({
+      where: {
+        id_livre: idLivre,
+        id: idSection,
       },
-    );
+      include: [{ model: Resultat, as: "resultat" }],
+      transaction,
+    });
 
     if (Array.isArray(destinations)) {
-      if (!destinations.isEmpty()) {
-        await newSection.removeSections();
+      if (!(destinations.length > 0)) {
+        await updatedSection.removeSections();
 
         for (const destination of destinations) {
           const search = await Section.findOne({
@@ -306,7 +304,7 @@ exports.updateSection = async (req, res) => {
           if (search === null) {
             res.status(404).json({ error: "Destination not found" });
           }
-          newSection.addSections(search);
+          updatedSection.addSections(search);
         }
       }
     }
@@ -316,7 +314,6 @@ exports.updateSection = async (req, res) => {
         res.status(400).json({ error: "Type none is not allowed for update" });
         break;
       case "des":
-        // on vérifie si resultat est défini
         if (typeof resultat === "undefined") {
           res.status(400).json({ error: "Type choix must not have resultat" });
         }
@@ -326,7 +323,6 @@ exports.updateSection = async (req, res) => {
           return;
         }
 
-        // resultat.condition est un dictionnaire avec un 1..* et chaque i est une list d'entier
         for (const key in resultat.condition) {
           if (!Array.isArray(resultat.condition[key])) {
             res
@@ -346,11 +342,16 @@ exports.updateSection = async (req, res) => {
           return;
         }
 
-        // on remove le resultat si il est présent
-        await newSection.removeResultat();
+        await updatedSection.setResultat(null);
 
-        resultat.id_section = newSection.id;
-        await newSection.addResultat(resultat);
+        resultat.id_section = updatedSection.id;
+        await updatedSection.createResultat({
+          id_section: updatedSection.id,
+          type_condition: resultat.type_condition,
+          condition: JSON.stringify(resultat.condition),
+          gagne: resultat.gagne,
+          perd: resultat.perd,
+        });
         break;
       case "enigme":
         // on vérifie si resultat est défini
@@ -373,10 +374,16 @@ exports.updateSection = async (req, res) => {
           return;
         }
 
-        await newSection.removeResultat();
+        await updatedSection.setResultat(null);
 
-        resultat.id_section = newSection.id;
-        await newSection.addResultat(resultat);
+        resultat.id_section = updatedSection.id;
+        await updatedSection.createResultat({
+          id_section: updatedSection.id,
+          type_condition: resultat.type_condition,
+          condition: resultat.condition.toString(),
+          gagne: resultat.gagne,
+          perd: resultat.perd,
+        });
         break;
       case "combat":
         if (typeof resultat === "undefined") {
@@ -414,14 +421,33 @@ exports.updateSection = async (req, res) => {
           return;
         }
 
-        await newSection.removeResultat();
+        await updatedSection.setResultat(null);
+
+        resultat.id_section = newSection.id;
+        await updatedSection.createResultat({
+          id_section: updatedSection.id,
+          type_condition: resultat.type_condition,
+          condition: resultat.condition.toString(),
+          gagne: resultat.gagne,
+          perd: resultat.perd,
+        });
 
         break;
       case "termine":
-        await newSection.removeSections();
-        await newSection.removeResultat();
+        await updatedSection.removeSections();
+        await updatedSection.setResultat(null);
         break;
     }
+
+    await updatedSection.update(
+      {
+        numero_section,
+        texte,
+        id_image,
+        type,
+      },
+      { transaction },
+    );
 
     await transaction.commit();
     res.status(200).json({ message: "Section updated" });
