@@ -22,40 +22,46 @@ exports.createLivre = async (req, res) => {
                 force,
                 resistance
             } = personnage;
-            if (!nom) {
+            if (nom === null) {
                 res.status(400).json({error: "Missing nom attributes in personnage"});
                 return;
             }
-            if (!description) {
+            if (description === null) {
                 res.status(400).json({error: "Missing description attributes in personnage"});
                 return;
             }
-            if (!occupation) {
+            if (occupation === null) {
                 res.status(400).json({error: "Missing occupation attributes in personnage"});
                 return;
             }
-            if (!apparence) {
+            if (apparence=== null) {
                 res.status(400).json({error: "Missing apparence attributes in personnage"});
                 return;
             }
-            if (!String(dexterite)) {
+            if (!Number.isInteger(dexterite)) {
                 res.status(400).json({error: "Missing dexterite attributes in personnage"});
                 return;
             }
-            if (!String(endurance)) {
+            if (!Number.isInteger(endurance)) {
                 res.status(400).json({error: "Missing endurance attributes in personnage"});
                 return;
             }
-            if (!String(psychisme)) {
+            if (!Number.isInteger(psychisme)) {
                 res.status(400).json({error: "Missing psychisme attributes in personnage"});
                 return;
             }
-            if (!String(force)) {
+            if (!Number.isInteger(force)) {
                 res.status(400).json({error: "Missing force attributes in personnage"});
                 return;
             }
-            if (!String(resistance)) {
+            if (!Number.isInteger(resistance)) {
                 res.status(400).json({error: "Missing resistance attributes in personnage"});
+                return;
+            }
+            // on vérifie que l'id de l'image existe
+            const image = await Image.findByPk(id_image, {transaction});
+            if (image === null) {
+                res.status(400).json({error: "Image not found"});
                 return;
             }
         }
