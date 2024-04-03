@@ -451,7 +451,7 @@ exports.updateSection = async (req, res) => {
           await queryRes.destroy();
         }
 
-        resultat.id_section = newSection.id;
+        resultat.id_section = updatedSection.id;
         await updatedSection.createResultat({
           id_section: updatedSection.id,
           type_condition: resultat.type_condition,
