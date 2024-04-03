@@ -172,7 +172,6 @@ exports.getAllSections = async (req, res) => {
       include: [
         {
           model: Resultat,
-          as: 'resultats',
         },
         {
           model: Section,
@@ -200,7 +199,6 @@ exports.getSectionById = async (req, res) => {
       include: [
         {
           model: Resultat,
-          as: 'resultats',
         },
         {
           model: Section,
