@@ -84,7 +84,7 @@ exports.createLivre = async (req, res) => {
             transaction
         });
 
-        if (!armeParDefaut) {
+        if (armeParDefaut === null) {
             armeParDefaut = await Arme.create(
                 {
                     titre: "Poing",
