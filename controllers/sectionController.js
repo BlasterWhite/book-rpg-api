@@ -238,6 +238,11 @@ exports.getAllSections = async (req, res) => {
         },
       ],
     });
+    sections.forEach((section) => {
+      if (section.resultat) {
+        section.resultat.condition = JSON.parse(section.resultat.condition);
+      }
+    });
     res.status(200).json(sections);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -266,6 +271,9 @@ exports.getSectionById = async (req, res) => {
         },
       ],
     });
+    if (section.resultat) {
+      section.resultat.condition = JSON.parse(section.resultat.condition);
+    }
     res.status(200).json(section);
   } catch (error) {
     res.status(500).json({ error: error.message });
