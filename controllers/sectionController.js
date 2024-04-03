@@ -291,8 +291,8 @@ exports.updateSection = async (req, res) => {
 
     if (Array.isArray(destinations)) {
       if (destinations.length > 0) {
-        const nbDestinations = updatedSection.getSections().length;
-        if (nbDestinations > 0) {
+        const nbDestinations = await updatedSection.getSections();
+        if (nbDestinations.length > 0) {
           await updatedSection.setSections(null);
         }
 
@@ -311,7 +311,7 @@ exports.updateSection = async (req, res) => {
         }
       }
     }
-
+    let queryRes;
     switch (type) {
       case "none":
         res.status(400).json({ error: "Type none is not allowed for update" });
@@ -345,7 +345,10 @@ exports.updateSection = async (req, res) => {
           return;
         }
 
-        await updatedSection.setResultat(null);
+        queryRes = await updatedSection.getResultat(); // Trouvez le résultat associé
+        if (queryRes) {
+          await queryRes.destroy(); // Supprimez le résultat s'il existe
+        }
 
         resultat.id_section = updatedSection.id;
         await updatedSection.createResultat({
@@ -377,7 +380,10 @@ exports.updateSection = async (req, res) => {
           return;
         }
 
-        await updatedSection.setResultat(null);
+        queryRes = await updatedSection.getResultat(); // Trouvez le résultat associé
+        if (queryRes) {
+          await queryRes.destroy(); // Supprimez le résultat s'il existe
+        }
 
         resultat.id_section = updatedSection.id;
         await updatedSection.createResultat({
@@ -424,7 +430,10 @@ exports.updateSection = async (req, res) => {
           return;
         }
 
-        await updatedSection.setResultat(null);
+        queryRes = await updatedSection.getResultat();
+        if (queryRes) {
+          await queryRes.destroy();
+        }
 
         resultat.id_section = newSection.id;
         await updatedSection.createResultat({
