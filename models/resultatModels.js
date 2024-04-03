@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../db/db");
+const Section = require("./sectionModels");
 
 const Resultat = sequelize.define(
     "resultat",
