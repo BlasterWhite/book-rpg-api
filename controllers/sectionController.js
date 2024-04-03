@@ -241,7 +241,11 @@ exports.getAllSections = async (req, res) => {
     sections.forEach((section) => {
       if (section.resultat) {
         if (section.resultat.type_condition === "JSON") {
-          section.resultat.condition = JSON.parse(section.resultat.condition);
+          try {
+            section.resultat.condition = JSON.parse(section.resultat.condition);
+          } catch (error) {
+            console.log(section.resultat.condition);
+          }
         }
       }
     });
