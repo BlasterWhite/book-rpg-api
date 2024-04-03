@@ -63,6 +63,19 @@ exports.createImageB64 = async (req, res) => {
   }
 };
 
+exports.createImageURL = async (req, res) => {
+  try {
+    if (!req.body.url) {
+      return res.status(400).json({ error: "Please provide an url" });
+    }
+
+    const image = await Image.create({ image: req.body.url });
+    res.status(201).json(image);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.updateImage = async (req, res) => {
   try {
     const image = await Image.findByPk(req.params.id);
