@@ -10,36 +10,30 @@ const personnageRoutes = require("./routes/personnageRoutes");
 const imageRoutes = require("./routes/imageRoutes");
 const aventureRoutes = require("./routes/aventureRoutes");
 const levenschteinRoutes = require("./routes/levenschteinRoutes");
+const armeRoutes = require("./routes/armeRoutes");
+const equipementRoutes = require("./routes/equipementRoutes");
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(
   cors({
-    origins: [
-        "http://193.168.146.103:8081",
-        "http://127.0.0.1:5173"
-    ], // Autorise les requêtes depuis cette origine
+    origins: ["http://193.168.146.103:8081", "http://127.0.0.1:5173"], // Autorise les requêtes depuis cette origine
     methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"], // Autorise ces méthodes HTTP
-    allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Origin", "Origin", "X-Requested-With", "Accept"], // Autorise ces en-têtes HTTP
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Access-Control-Allow-Origin",
+      "Origin",
+      "X-Requested-With",
+      "Accept",
+    ], // Autorise ces en-têtes HTTP
     credentials: true, // Autorise l'envoi de cookies avec la demande
     maxAge: 86400, // Cache les résultats de la requête pré-vol (OPTIONS) pendant 24 heures
   }),
 );
 
 const secretKey = "sklLeevR0FHz5ha%2ys#";
-
-// app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Allow-Origin",
-//   );
-//   res.header("Access-Control-Allow-Credentials", "true");
-//   res.header("Access-Control-Max-Age", "1800");
-//   next();
-// });
 
 app.use((req, res, next) => {
   if (
@@ -73,5 +67,7 @@ app.use("/personnages", personnageRoutes);
 app.use("/images", imageRoutes);
 app.use("/aventures", aventureRoutes);
 app.use("/levenschtein", levenschteinRoutes);
+app.use("/armes", armeRoutes);
+app.use("/equipements", equipementRoutes);
 
 module.exports = app;
