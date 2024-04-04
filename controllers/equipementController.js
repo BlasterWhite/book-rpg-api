@@ -40,11 +40,13 @@ exports.createEquipement = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
-    const { nom, degats } = req.body;
+    const { nom, description, id_image, resistance } = req.body;
     const equipement = await Equipement.create(
       {
         nom,
-        degats,
+        description,
+        id_image,
+        resistance,
       },
       { transaction },
     );
@@ -61,11 +63,13 @@ exports.updateEquipement = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const { id } = req.params;
-    const { nom, degats } = req.body;
+    const { nom, description, id_image, resistance } = req.body;
     await Equipement.update(
       {
         nom,
-        degats,
+        description,
+        id_image,
+        resistance,
       },
       {
         where: {
