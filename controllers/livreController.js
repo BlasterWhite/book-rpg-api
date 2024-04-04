@@ -96,7 +96,7 @@ exports.getAllNewLivres = async (req, res) => {
 
 exports.getAllPopularLivres = async (req, res) => {
     try {
-        const livres = await Livre.findAll({
+        const livres = await Ave.findAll({
             attributes: ['id', 'titre', 'resume', 'id_image', 'tag', 'date_sortie'],
             include: [
                 {
