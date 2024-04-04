@@ -14,7 +14,7 @@ const Event = sequelize.define(
     },
     type: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     value: {
       type: DataTypes.INTEGER,
