@@ -103,14 +103,13 @@ exports.getAllNewLivres = async (req, res) => {
 exports.getAllPopularLivres = async (req, res) => {
   try {
     const livres = await Aventure.findAll({
-      attributes: ["id", "titre", "resume", "id_image", "tag", "date_sortie"],
       include: [
         {
-          model: Aventure,
+          model: Livre,
           attributes: [],
           required: true,
           duplicating: false,
-          group: ["id_livre"],
+          group: ["id"],
         },
       ],
       group: ["Livre.id"],
