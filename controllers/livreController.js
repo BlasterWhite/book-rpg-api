@@ -110,7 +110,6 @@ exports.deleteLivre = async (req, res) => {
 exports.getAllNewLivres = async (req, res) => {
   try {
     const livres = await Livre.findAll({
-      attributes: ["titre", "resume", "id_image", "tag", "date_sortie"],
       order: [["date_sortie", "DESC"]],
       limit: 10,
     });
