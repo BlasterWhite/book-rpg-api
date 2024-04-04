@@ -1,5 +1,7 @@
 const Livre = require("../models/livreModels");
 const Image = require("../models/imageModels");
+const Aventure = require("../models/aventureModels");
+const { Sequelize } = require("sequelize");
 
 exports.createLivre = async (req, res) => {
     try {
