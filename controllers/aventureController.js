@@ -55,10 +55,16 @@ exports.createAventure = async (req, res) => {
 
         const personnageCreated = await Personnage.create({
             nom: personnage.nom,
+            apparence: personnage.apparence,
+            occupation: personnage.occupation,
             description: personnage.description,
             id_image: personnage.id_image,
             id_livre: personnage.id_livre,
-            attribut: personnage.attribut,
+            dexterite: personnage.dexterite,
+            force: personnage.force,
+            endurance: personnage.endurance,
+            psychisme: personnage.psychisme,
+            resistance: personnage.resistance,
             id_personnage_default: personnage.id_personnage_default,
         }, {transaction});
 
