@@ -1,4 +1,6 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const bodyParser = require("body-parser");
 
 const userRoutes = require("./routes/userRoutes");
 const livreRoutes = require("./routes/livreRoutes");
@@ -10,11 +12,9 @@ const levenschteinRoutes = require("./routes/levenschteinRoutes");
 
 const app = express();
 
-app.use(express.json());
+app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
-  res.send("Hello World");
-});
+const secretKey = "sklLeevR0FHz5ha%2ys#";
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -24,6 +24,29 @@ app.use((req, res, next) => {
     "Origin, X-Requested-With, Content-Type, Accept",
   );
   next();
+});
+
+app.use((req, res, next) => {
+  if (
+    (req.path === "/livres" && req.method === "GET") ||
+    req.path.includes("/users") ||
+    (req.path === "/images" && req.method === "GET")
+  ) {
+    next();
+  } else {
+    const token = req.headers["authorization"];
+    if (!token) {
+      return res.status(401).json({ message: "Token non fourni" });
+    }
+
+    jwt.verify(token, secretKey, (err, decoded) => {
+      if (err) {
+        return res.status(403).json({ message: "Token invalide" });
+      }
+      req.user = decoded;
+      next();
+    });
+  }
 });
 
 app.use("/users", userRoutes);

@@ -1,9 +1,47 @@
 const sequelize = require("../db/db");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const User = require("../models/userModels");
 const Aventure = require("../models/aventureModels");
 const { Personnage } = require("../models/personnageModels");
+
+exports.loginUser = async (req, res) => {
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+    const { email, password } = req.body;
+    const user = await User.findOne({
+      where: {
+        mail: email,
+      },
+      transaction,
+      attributes: ["id", "mail", "mot_de_passe"],
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found !" });
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.mot_de_passe);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Invalid user or password !" });
+    }
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.mail,
+      },
+      "sklLeevR0FHz5ha%2ys#",
+      {
+        expiresIn: "24h",
+      },
+    );
+    transaction.commit();
+    res.status(200).json({ token });
+  } catch (error) {
+    if (transaction) await transaction.rollback();
+    res.status(500).json({ error: error.message });
+  }
+};
 
 exports.createUser = async (req, res) => {
   let transaction;
