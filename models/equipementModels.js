@@ -38,8 +38,8 @@ const Equipement = sequelize.define(
 );
 
 Equipement.hasOne(Image, {
-  foreignKey: "id_image",
-  sourceKey: "id",
+  foreignKey: "id",
+  sourceKey: "id_image",
   as: "image",
 });
 

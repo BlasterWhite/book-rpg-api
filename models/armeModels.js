@@ -42,8 +42,8 @@ const Arme = sequelize.define(
 );
 
 Arme.hasOne(Image, {
-  foreignKey: "id_image",
-  sourceKey: "id",
+  foreignKey: "id",
+  sourceKey: "id_image",
   as: "image",
 });
 
