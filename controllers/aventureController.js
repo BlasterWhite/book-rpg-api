@@ -101,7 +101,7 @@ exports.createAventure = async (req, res) => {
         // on vérifie que une aventure avc l'id de personnage n'existe pas
         const aventureExist = await Aventure.findOne({
             where: {
-                id_personnage,
+                id_personnage: personnageCreated.id,
                 statut: "en cours"
             },
             transaction
@@ -115,7 +115,7 @@ exports.createAventure = async (req, res) => {
             id_utilisateur,
             id_livre,
             id_section_actuelle: section.id,
-            id_personnage,
+            id_personnage: personnageCreated.id,
             statut: "en cours",
         }, {transaction});
 
