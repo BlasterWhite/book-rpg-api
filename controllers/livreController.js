@@ -1,6 +1,5 @@
 const Livre = require("../models/livreModels");
 const Image = require("../models/imageModels");
-const Aventure = require("../models/aventureModels");
 const sequelize = require("../db/db");
 
 exports.createLivre = async (req, res) => {
@@ -122,24 +121,22 @@ exports.getAllNewLivres = async (req, res) => {
 };
 
 exports.getAllPopularLivres = async (req, res) => {
+  let transaction;
   try {
-    const livres = await Aventure.findAll({
-      include: [
-        {
-          model: Livre,
-          attributes: [],
-          required: true,
-          duplicating: false,
-          group: ["id"],
-        },
-      ],
-      group: ["Livre.id"],
-      order: sequelize.literal(
-        'COUNT(DISTINCT "Aventure.id_utilisateur") DESC',
-      ),
-    });
+    transaction = await sequelize.transaction();
+    const livres = await sequelize.query(
+      `SELECT l.titre, l.resume, l.id_image, l.tag, l.date_sortie
+        FROM bookrpg.livre l
+        JOIN bookrpg.aventure a ON l.id = a.id_livre
+        GROUP BY l.id
+        ORDER BY COUNT(DISTINCT a.id_utilisateur) DESC
+        LIMIT 10;`,
+      { type: sequelize.QueryTypes.SELECT, transaction },
+    );
+    transaction.commit();
     res.status(200).json(livres);
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
