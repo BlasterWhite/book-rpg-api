@@ -134,7 +134,7 @@ exports.getAllPopularLivres = async (req, res) => {
         },
       ],
       group: ["Livre.id"],
-      order: Sequelize.literal(
+      order: sequelize.literal(
         'COUNT(DISTINCT "Aventures.id_utilisateur") DESC',
       ),
     });
