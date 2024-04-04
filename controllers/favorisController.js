@@ -1,4 +1,5 @@
 const Favoris = require("../models/favorisModels");
+const sequelize = require("../db/db");
 
 exports.getAllFavoris = async (req, res) => {
   try {
