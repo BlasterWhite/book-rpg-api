@@ -1,5 +1,6 @@
 const sequelize = require("../db/db");
 
+const Image = require("../models/imageModels");
 const Equipement = require("../models/equipementModels");
 
 exports.getAllEquipement = async (req, res) => {
@@ -7,6 +8,13 @@ exports.getAllEquipement = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const equipement = await Equipement.findAll({
+      include: [
+        {
+          model: Image,
+          as: "image",
+          attributes: ["image"],
+        },
+      ],
       transaction,
     });
     transaction.commit();
@@ -26,6 +34,13 @@ exports.getOneEquipement = async (req, res) => {
       where: {
         id,
       },
+      include: [
+        {
+          model: Image,
+          as: "image",
+          attributes: ["image"],
+        },
+      ],
       transaction,
     });
     transaction.commit();
