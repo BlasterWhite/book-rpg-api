@@ -177,3 +177,22 @@ exports.deleteAventure = async (req, res) => {
         res.status(500).json({error: error.message});
     }
 };
+
+exports.getAllMostAventure = async (req, res) => {
+    let transaction;
+    try {
+        transaction = await sequelize.transaction();
+        const aventures = await Aventure.findAll({
+            attributes: ["id_livre", [sequelize.fn("COUNT", sequelize.literal("DISTINCT id_utilisateur")), "id_utilisateur"]],
+            group: ["id_livre"],
+            order: [[sequelize.fn("COUNT", sequelize.literal("DISTINCT id_utilisateur")), "DESC"]],
+            limit: 10,
+            transaction
+        });
+        await transaction.commit();
+        res.status(200).json(aventures);
+    } catch (error) {
+        if (transaction) await transaction.rollback();
+        res.status(500).json({error: error.message});
+    }
+}
