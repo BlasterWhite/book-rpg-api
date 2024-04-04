@@ -218,21 +218,21 @@ exports.getAventureById = async (req, res) => {
 };
 
 exports.getAventureByIdLivre = async (req, res) => {
-    let transaction;
-    try {
-        transaction = await sequelize.transaction();
-        const { idUser, idLivre } = req.params;
-        const aventure = await Aventure.findOne({
-        where: {
-            id_utilisateur: idUser,
-            id_livre: idLivre,
-        },
-        transaction,
-        });
-        transaction.commit();
-        res.status(200).json(aventure);
-    } catch (error) {
-        if (transaction) await transaction.rollback();
-        res.status(500).json({ error: error.message });
-    }
-}
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+    const { idUser, idLivre } = req.params;
+    const aventure = await Aventure.findOne({
+      where: {
+        id_utilisateur: idUser,
+        id_livre: idLivre,
+      },
+      transaction,
+    });
+    transaction.commit();
+    res.status(200).json(aventure);
+  } catch (error) {
+    if (transaction) await transaction.rollback();
+    res.status(500).json({ error: error.message });
+  }
+};
