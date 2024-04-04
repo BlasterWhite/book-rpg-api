@@ -114,6 +114,22 @@ exports.getAllNewLivres = async (req, res) => {
       order: [["date_sortie", "DESC"]],
       limit: 10,
     });
+    if (livres.length === 0) {
+      const livres = await Livre.findAll({
+        order: [["date_sortie", "DESC"]],
+        include: [
+          {
+            model: Image,
+            as: "image",
+            attributes: ["image"],
+          },
+        ],
+        limit: 10,
+      });
+      transaction.commit();
+      res.status(200).json(livres);
+      return;
+    }
     res.status(200).json(livres);
   } catch (error) {
     res.status(500).json({ error: error.message });
