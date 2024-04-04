@@ -26,7 +26,7 @@ exports.createLivre = async (req, res) => {
       {
         titre,
         resume,
-        image: image.id,
+        id_image: image.id,
         tag,
         date_sortie,
       },
