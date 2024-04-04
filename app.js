@@ -29,7 +29,9 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   if (
     (req.path === "/livres" && req.method === "GET") ||
-    req.path.includes("/users") ||
+    (req.path.includes("/users") &&
+      (!req.path.includes("favoris") || !req.path.includes("aventures")) &&
+      req.method === "POST") ||
     (req.path === "/images" && req.method === "GET")
   ) {
     next();
