@@ -133,6 +133,17 @@ exports.getAllPopularLivres = async (req, res) => {
         LIMIT 10;`,
       { type: sequelize.QueryTypes.SELECT, transaction },
     );
+    // si le retour est un tableau vide on retourne la liste des livres
+    if (livres.length === 0) {
+      const livres = await Livre.findAll({
+        attributes: ["titre", "resume", "id_image", "tag", "date_sortie"],
+        order: [["date_sortie", "DESC"]],
+        limit: 10,
+      });
+      transaction.commit();
+      res.status(200).json(livres);
+      return;
+    }
     transaction.commit();
     res.status(200).json(livres);
   } catch (error) {
