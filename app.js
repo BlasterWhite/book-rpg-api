@@ -37,7 +37,10 @@ const secretKey = "sklLeevR0FHz5ha%2ys#";
 
 app.use((req, res, next) => {
   if (
-    (req.path === "/livres" && req.method === "GET") ||
+    ((req.path === "/livres" ||
+      req.path.includes("popular") ||
+      req.path.includes("news")) &&
+      req.method === "GET") ||
     (req.path.includes("/users") &&
       (!req.path.includes("favoris") || !req.path.includes("aventures")) &&
       req.method === "POST") ||
