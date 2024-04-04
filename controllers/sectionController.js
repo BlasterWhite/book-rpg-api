@@ -327,8 +327,15 @@ exports.updateSection = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const { idLivre, idSection } = req.params;
-    const { numero_section, texte, id_image, type, resultat, destinations } =
-      req.body;
+    const {
+      numero_section,
+      texte,
+      id_image,
+      type,
+      resultat,
+      destinations,
+      event,
+    } = req.body;
 
     const updatedSection = await Section.findOne({
       where: {
@@ -338,6 +345,11 @@ exports.updateSection = async (req, res) => {
       include: [{ model: Resultat, as: "resultat" }],
       transaction,
     });
+
+    if (!updatedSection) {
+      res.status(404).json({ error: "Section not found" });
+      return;
+    }
 
     if (Array.isArray(destinations)) {
       if (destinations.length > 0) {
@@ -499,6 +511,33 @@ exports.updateSection = async (req, res) => {
         await updatedSection.setSections(null);
         await updatedSection.setResultat(null);
         break;
+    }
+
+    if (event) {
+      const events = await updatedSection.getEvents();
+      for (const e of events) {
+        await Event.destroy({
+          where: {
+            id_section: idSection,
+            id: e.id,
+          },
+          transaction,
+        });
+      }
+    }
+
+    for (const e of event) {
+      const res = await Event.create(
+        {
+          id_section: idSection,
+          operation: e.operation,
+          which: e.which,
+          type: e.type,
+          value: e.value,
+        },
+        { transaction },
+      );
+      updatedSection.addEvents(res);
     }
 
     await updatedSection.update(
