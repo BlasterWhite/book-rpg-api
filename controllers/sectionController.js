@@ -280,6 +280,10 @@ exports.getSectionById = async (req, res) => {
                     foreignKey: "id_section_source",
                     otherKey: "id_section_destination",
                 },
+                {
+                    model: Image,
+                    as: "image",
+                }
             ],
         });
         if (section.resultat) {
