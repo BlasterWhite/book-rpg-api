@@ -24,15 +24,20 @@ exports.getFavorisByLivre = async (req, res) => {
 };
 
 exports.createFavoris = async (req, res) => {
+  let transaction;
   try {
     const { idUser } = req.params;
     const { id_livre } = req.body;
+    transaction = await sequelize.transaction();
     const favoris = await Favoris.create({
       id_utilisateur: idUser,
       id_livre: id_livre,
+      transaction,
     });
+    await transaction.commit();
     res.status(201).json(favoris);
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
