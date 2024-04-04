@@ -36,7 +36,17 @@ exports.loginUser = async (req, res) => {
       },
     );
     transaction.commit();
-    res.status(200).json({ token });
+    res
+      .status(200)
+      .json({
+        token,
+        user: {
+          id: user.id,
+          email: user.mail,
+          name: user.nom,
+          firstname: user.prenom,
+        },
+      });
   } catch (error) {
     if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
