@@ -3,6 +3,6 @@ const levenschteinController = require("../controllers/levenschteinController");
 
 const router = express.Router();
 
-router.get("/", levenschteinController.calculateLevenshteinDistance);
+router.post("/", levenschteinController.calculateLevenshteinDistance);
 
 module.exports = router;
