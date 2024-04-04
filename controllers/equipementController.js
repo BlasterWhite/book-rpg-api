@@ -56,11 +56,17 @@ exports.createEquipement = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const { nom, description, id_image, resistance } = req.body;
+    let image = await Image.findByPk(id_image);
+    if (!image) {
+      image = await Image.create({
+        image: "https://picsum.photos/270/500",
+      });
+    }
     const equipement = await Equipement.create(
       {
         nom,
         description,
-        id_image,
+        id_image: image.id,
         resistance,
       },
       { transaction },

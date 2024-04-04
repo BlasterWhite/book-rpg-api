@@ -6,10 +6,16 @@ const { Sequelize } = require("sequelize");
 exports.createLivre = async (req, res) => {
   try {
     const { titre, resume, id_image, tag, date_sortie } = req.body;
+    let image = await Image.findByPk(id_image);
+    if (!image) {
+      image = await Image.create({
+        image: "https://picsum.photos/270/500",
+      });
+    }
     const livre = await Livre.create({
       titre,
       resume,
-      id_image,
+      image: image.id,
       tag,
       date_sortie,
     });

@@ -12,6 +12,13 @@ exports.createSection = async (req, res) => {
     const { numero_section, texte, id_image, type, resultat, destinations } =
       req.body;
 
+    let image = await Image.findByPk(id_image);
+    if (!image) {
+      image = await Image.create({
+        image: "https://picsum.photos/270/500",
+      });
+    }
+
     if (
       typeof numero_section === "undefined" ||
       typeof texte === "undefined" ||
@@ -27,7 +34,7 @@ exports.createSection = async (req, res) => {
         id_livre: Number(idLivre),
         numero_section,
         texte,
-        id_image,
+        id_image: image.id,
         type,
         resultat,
       },
