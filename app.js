@@ -18,7 +18,7 @@ app.use(
   cors({
     origin: "http://193.168.146.103:8081", // Autorise les requêtes depuis cette origine
     methods: ["GET", "POST", "OPTIONS"], // Autorise ces méthodes HTTP
-    allowedHeaders: ["Content-Type", "Authorization"], // Autorise ces en-têtes personnalisés
+    allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Origin", "Origin", "X-Requested-With", "Accept"], // Autorise ces en-têtes HTTP
     credentials: true, // Autorise l'envoi de cookies avec la demande
     maxAge: 86400, // Cache les résultats de la requête pré-vol (OPTIONS) pendant 24 heures
   }),
