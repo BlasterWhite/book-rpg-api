@@ -5,6 +5,7 @@ const sectionController = require("../controllers/sectionController");
 const router = express.Router();
 
 router.get("/news", livreController.getAllNewLivres);
+router.get("/popular", livreController.getAllPopularLivres);
 router.get("/", livreController.getAllLivres);
 router.get("/:id", livreController.getLivreById);
 router.post("/", livreController.createLivre);
