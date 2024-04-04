@@ -16,7 +16,10 @@ const app = express();
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: "http://193.168.146.103:8081", // Autorise les requêtes depuis cette origine
+    origins: [
+        "http://193.168.146.103:8081",
+        "http://127.0.0.1:5173"
+    ], // Autorise les requêtes depuis cette origine
     methods: ["GET", "POST", "OPTIONS"], // Autorise ces méthodes HTTP
     allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Origin", "Origin", "X-Requested-With", "Accept"], // Autorise ces en-têtes HTTP
     credentials: true, // Autorise l'envoi de cookies avec la demande
