@@ -137,6 +137,13 @@ exports.getAllPopularLivres = async (req, res) => {
     if (livres.length === 0) {
       const livres = await Livre.findAll({
         order: [["date_sortie", "DESC"]],
+        include: [
+          {
+            model: Image,
+            as: "image",
+            attributes: ["image"],
+          },
+        ],
         limit: 10,
       });
       transaction.commit();
