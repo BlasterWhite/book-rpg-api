@@ -40,11 +40,14 @@ exports.createArme = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
-    const { nom, degats } = req.body;
+    const { titre, description, id_image, degats, durabilite } = req.body;
     const arme = await Arme.create(
       {
-        nom,
+        titre,
+        description,
+        id_image,
         degats,
+        durabilite,
       },
       { transaction },
     );
@@ -61,11 +64,14 @@ exports.updateArme = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const { id } = req.params;
-    const { nom, degats } = req.body;
+    const { titre, description, id_image, degats, durabilite } = req.body;
     await Arme.update(
       {
-        nom,
+        titre,
+        description,
+        id_image,
         degats,
+        durabilite,
       },
       {
         where: {
