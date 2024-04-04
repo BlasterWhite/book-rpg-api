@@ -18,4 +18,18 @@ router.post("/:idLivre/sections", sectionController.createSection);
 router.put("/:idLivre/sections/:idSection", sectionController.updateSection);
 router.delete("/:idLivre/sections/:idSection", sectionController.deleteSection);
 
+router.post(
+  "/:idLivre/sections/:idSection/events",
+  sectionController.createEvent,
+);
+router.put(
+  "/:idLivre/sections/:idSection/events/:idEvent",
+  sectionController.updateEvent,
+);
+
+router.delete(
+  "/:idLivre/sections/:idSection/events/:idEvent",
+  sectionController.deleteEvent,
+);
+
 module.exports = router;

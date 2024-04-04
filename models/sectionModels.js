@@ -4,6 +4,7 @@ const sequelize = require("../db/db");
 const Image = require("./imageModels");
 const Livre = require("./livreModels");
 const Resultat = require("./resultatModels");
+const Event = require("./eventModels");
 
 const Section = sequelize.define(
   "section",
@@ -99,6 +100,17 @@ Section.hasOne(Resultat, {
   foreignKey: "id_section",
   sourceKey: "id",
   as: "resultat",
+});
+
+Section.hasMany(Event, {
+  foreignKey: "id_section",
+  sourceKey: "id",
+  as: "events",
+});
+Event.belongsTo(Section, {
+  foreignKey: "id_section",
+  targetKey: "id",
+  as: "section_event",
 });
 
 Section.getAttributes = () => {
