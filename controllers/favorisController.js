@@ -44,29 +44,42 @@ exports.createFavoris = async (req, res) => {
 };
 
 exports.updateFavoris = async (req, res) => {
+  let transaction;
   try {
     const { idUser } = req.params;
     const { id_livre } = req.body;
+    transaction = await sequelize.transaction();
     const favoris = await Favoris.findByPk(req.params.id);
-    await favoris.update({
-      id_utilisateur: idUser,
-      id_livre,
-    });
-    res.json(favoris);
+    await favoris.update(
+      {
+        id_utilisateur: idUser,
+        id_livre,
+      },
+      { transaction },
+    );
+    await transaction.commit();
+    res.status(200).json(favoris);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 exports.deleteFavoris = async (req, res) => {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     await Favoris.destroy({
       where: {
         id_utilisateur: req.params.idUser,
         id_livre: req.params.idLivre,
       },
+      transaction,
     });
-    res.json({ message: `Favoris for book ${req.params.idLivre} deleted` });
+    // res.json({ message: `Favoris for book ${req.params.idLivre} deleted` });
+    await transaction.commit();
+    res
+      .status(204)
+      .json({ message: `Favoris for book ${req.params.idLivre} deleted` });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
