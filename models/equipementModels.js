@@ -37,6 +37,12 @@ const Equipement = sequelize.define(
   },
 );
 
+Equipement.hasOne(Image, {
+  foreignKey: "id_image",
+  sourceKey: "id",
+  as: "image",
+});
+
 Equipement.getAttributes = () => {
   return ["id", "nom", "description", "id_image", "resistance"];
 };
