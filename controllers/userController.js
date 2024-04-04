@@ -1,87 +1,182 @@
+const sequelize = require("../db/db");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+
 const User = require("../models/userModels");
 const Aventure = require("../models/aventureModels");
 const { Personnage } = require("../models/personnageModels");
-const bcrypt = require("bcrypt");
+
+exports.loginUser = async (req, res) => {
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+    const { email, password } = req.body;
+    const user = await User.findOne({
+      where: {
+        mail: email,
+      },
+      transaction,
+      attributes: ["id", "mail", "mot_de_passe", "nom", "prenom"],
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found !" });
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.mot_de_passe);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Invalid user or password !" });
+    }
+
+    // si l'utilisateur à déjà un token on le supprime
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.mail,
+      },
+      "sklLeevR0FHz5ha%2ys#",
+      {
+        expiresIn: "24h",
+      },
+    );
+    transaction.commit();
+    res.status(200).json({
+      token,
+      user: {
+        id: user.id,
+        email: user.mail,
+        lastname: user.nom,
+        firstname: user.prenom,
+      },
+    });
+  } catch (error) {
+    if (transaction) await transaction.rollback();
+    res.status(500).json({ error: error.message });
+  }
+};
 
 exports.createUser = async (req, res) => {
+  let transaction;
   try {
-    const { mail, nom, prenom, mot_de_passe } = req.body;
-    const mot_de_passe_crypte = await bcrypt.hash(mot_de_passe, 10);
-    const user = await User.create({
-      mail,
-      nom,
-      prenom,
-      mot_de_passe: mot_de_passe_crypte,
-    }); // INSERT INTO User (username, birthday) VALUES ('username',
+    transaction = await sequelize.transaction();
+    const { email, firstname, lastname, password } = req.body;
+    const mot_de_passe_crypte = await bcrypt.hash(password, 10);
+    const userExist = await User.findOne({
+      where: {
+        mail: email,
+      },
+      transaction,
+    });
+    if (userExist !== null) {
+      res.status(400).json({ error: "User already exists" });
+      return;
+    }
+
+    const user = await User.create(
+      {
+        mail: email,
+        nom: lastname,
+        prenom: firstname,
+        mot_de_passe: mot_de_passe_crypte,
+      },
+      {
+        transaction,
+        attributes: ["mail", "nom", "prenom"],
+      },
+    );
+    transaction.commit();
+    delete user.dataValues.mot_de_passe;
     res.status(201).json(user);
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
 
 exports.getAllUsers = async (req, res) => {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const users = await User.findAll({
       attributes: ["mail", "nom", "prenom"],
-    }); // SELECT username, birthday FROM User;
+      transaction,
+    });
+    transaction.commit();
     res.status(200).json(users);
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
 
 exports.getUserById = async (req, res) => {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { id } = req.params;
     const user = await User.findByPk(id, {
       attributes: ["mail", "nom", "prenom"],
+      transaction,
     }); // SELECT * FROM User WHERE id = id;
+    transaction.commit();
     res.status(200).json(user);
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
 
 exports.updateUser = async (req, res) => {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { id } = req.params;
-    const { mail, nom, prenom, mot_de_passe } = req.body;
-    const mot_de_passe_crypte = await bcrypt.hash(mot_de_passe, 10);
+    const { mail, nom, prenom, password } = req.body;
+    const mot_de_passe_crypte = await bcrypt.hash(password, 10);
     await User.update(
       { mail, nom, prenom, mot_de_passe: mot_de_passe_crypte },
       {
         where: {
           id,
         },
+        transaction,
       },
-    ); // UPDATE User SET username = 'username', birthday = 'birthday' WHERE id = id;
+    );
+    transaction.commit();
     res.status(200).json({ message: "User updated" });
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
 
 exports.deleteUser = async (req, res) => {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { id } = req.params;
     await User.destroy({
       where: {
         id,
       },
-    }); // DELETE FROM User WHERE id = id;
+      transaction,
+    });
+    transaction.commit();
     res.status(200).json({ message: "User deleted" });
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
 
 exports.getAllAventures = async (req, res) => {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { idUser } = req.params;
     const aventures = await Aventure.findAll({
       where: {
         id_utilisateur: idUser,
       },
+      transaction,
       include: [
         {
           model: User,
@@ -93,24 +188,31 @@ exports.getAllAventures = async (req, res) => {
           as: "personnage",
         },
       ],
-    }); // SELECT * FROM Aventure WHERE id_user = idUser;
+    });
+    transaction.commit();
     res.status(200).json(aventures);
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
 
 exports.getAventureById = async (req, res) => {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { idUser, idAventure } = req.params;
     const aventure = await Aventure.findOne({
       where: {
         id: idAventure,
         id_utilisateur: idUser,
       },
-    }); // SELECT * FROM Aventure WHERE id = idAventure AND id_user = idUser;
+      transaction,
+    });
+    transaction.commit();
     res.status(200).json(aventure);
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
