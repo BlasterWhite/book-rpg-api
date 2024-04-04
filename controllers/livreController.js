@@ -136,7 +136,6 @@ exports.getAllPopularLivres = async (req, res) => {
     // si le retour est un tableau vide on retourne la liste des livres
     if (livres.length === 0) {
       const livres = await Livre.findAll({
-        attributes: ["titre", "resume", "id_image", "tag", "date_sortie"],
         order: [["date_sortie", "DESC"]],
         limit: 10,
       });
