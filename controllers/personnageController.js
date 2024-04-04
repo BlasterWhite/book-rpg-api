@@ -141,7 +141,15 @@ exports.updateArmes = async (req, res) => {
     const { id_arme } = req.body;
     transaction = await sequelize.transaction();
     const personnage = await Personnage.findByPk(id, { transaction });
+    if (!personnage) {
+      res.status(404).json({ message: "Personnage not found" });
+      return;
+    }
     const arme = await Arme.findByPk(id_arme, { transaction });
+    if (!arme) {
+      res.status(404).json({ message: "Arme not found" });
+      return;
+    }
     await personnage.addArme(arme, { transaction });
     await transaction.commit();
     res.status(200).json({ message: "Arme added to personnage" });
@@ -158,9 +166,17 @@ exports.updateEquipement = async (req, res) => {
     const { id_equipement } = req.body;
     transaction = await sequelize.transaction();
     const personnage = await Personnage.findByPk(id, { transaction });
+    if (!personnage) {
+      res.status(404).json({ message: "Personnage not found" });
+      return;
+    }
     const equipement = await Equipement.findByPk(id_equipement, {
       transaction,
     });
+    if (!equipement) {
+      res.status(404).json({ message: "Equipement not found" });
+      return;
+    }
     await personnage.addEquipement(equipement, { transaction });
     await transaction.commit();
     res.status(200).json({ message: "Equipement added to personnage" });
@@ -174,13 +190,34 @@ exports.updateAttributes = async (req, res) => {
   let transaction;
   try {
     const { id } = req.params;
-    const { id_attribute } = req.body;
+    const { attributes } = req.body;
     transaction = await sequelize.transaction();
     const personnage = await Personnage.findByPk(id, { transaction });
-    const attribute = await Attribute.findByPk(id_attribute, { transaction });
-    await personnage.addAttribute(attribute, { transaction });
+    if (!personnage) {
+      res.status(404).json({ message: "Personnage not found" });
+      return;
+    }
+
+    // attributes est un dictionnaire d'attributs qui sont un des suivant
+    const attributOriginal = [
+      "dexterite",
+      "endurance",
+      "psychisme",
+      "force",
+      "resistance",
+    ];
+
+    const attribut = Object.keys(attributes);
+    for (let i = 0; i < attribut.length; i++) {
+      if (!attributOriginal.includes(attribut[i])) {
+        res.status(400).json({ message: `Attribute ${attribut[i]} not found` });
+        return;
+      }
+    }
+    await personnage.update(attributes, { transaction });
+
     await transaction.commit();
-    res.status(200).json({ message: "Attribute added to personnage" });
+    res.status(200).json({ message: "Attributes updated to personnage" });
   } catch (error) {
     if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
