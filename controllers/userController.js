@@ -16,7 +16,7 @@ exports.loginUser = async (req, res) => {
         mail: email,
       },
       transaction,
-      attributes: ["id", "mail", "mot_de_passe"],
+      attributes: ["id", "mail", "mot_de_passe", "nom", "prenom"],
     });
     if (!user) {
       return res.status(404).json({ error: "User not found !" });
@@ -25,6 +25,8 @@ exports.loginUser = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid user or password !" });
     }
+
+    // si l'utilisateur à déjà un token on le supprime
     const token = jwt.sign(
       {
         id: user.id,
@@ -36,17 +38,15 @@ exports.loginUser = async (req, res) => {
       },
     );
     transaction.commit();
-    res
-      .status(200)
-      .json({
-        token,
-        user: {
-          id: user.id,
-          email: user.mail,
-          name: user.nom,
-          firstname: user.prenom,
-        },
-      });
+    res.status(200).json({
+      token,
+      user: {
+        id: user.id,
+        email: user.mail,
+        lastname: user.nom,
+        firstname: user.prenom,
+      },
+    });
   } catch (error) {
     if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
