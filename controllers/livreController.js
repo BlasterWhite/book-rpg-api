@@ -1,26 +1,41 @@
 const Livre = require("../models/livreModels");
 const Image = require("../models/imageModels");
 const Aventure = require("../models/aventureModels");
-const { Sequelize } = require("sequelize");
+const sequelize = require("../db/db");
 
 exports.createLivre = async (req, res) => {
+  let transaction;
   try {
     const { titre, resume, id_image, tag, date_sortie } = req.body;
-    let image = await Image.findByPk(id_image);
-    if (!image) {
-      image = await Image.create({
-        image: "https://picsum.photos/270/500",
+    transaction = await sequelize.transaction();
+    let image;
+    if (id_image) {
+      image = await Image.findByPk(id_image, {
+        transaction,
       });
     }
-    const livre = await Livre.create({
-      titre,
-      resume,
-      image: image.id,
-      tag,
-      date_sortie,
-    });
+    if (!image) {
+      image = await Image.create(
+        {
+          image: "https://picsum.photos/270/500",
+        },
+        { transaction },
+      );
+    }
+    const livre = await Livre.create(
+      {
+        titre,
+        resume,
+        image: image.id,
+        tag,
+        date_sortie,
+      },
+      { transaction },
+    );
+    transaction.commit();
     res.status(201).json(livre);
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };

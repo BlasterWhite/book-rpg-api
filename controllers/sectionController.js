@@ -12,7 +12,12 @@ exports.createSection = async (req, res) => {
     const { numero_section, texte, id_image, type, resultat, destinations } =
       req.body;
 
-    let image = await Image.findByPk(id_image);
+    let image;
+    if (id_image) {
+      image = await Image.findByPk(id_image, {
+        transaction,
+      });
+    }
     if (!image) {
       image = await Image.create({
         image: "https://picsum.photos/270/500",
