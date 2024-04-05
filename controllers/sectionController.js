@@ -3,6 +3,7 @@ const Resultat = require("../models/resultatModels");
 const Section = require("../models/sectionModels");
 const Image = require("../models/imageModels");
 const Event = require("../models/eventModels");
+const Equipement = require("../models/equipementModels");
 
 exports.createSection = async (req, res) => {
     let transaction;

@@ -7,6 +7,8 @@ const Arme = require("../models/armeModels");
 const Image = require("../models/imageModels");
 const Aventure = require("../models/aventureModels");
 const sequelize = require("../db/db");
+const Equipement = require("../models/equipementModels");
+
 
 exports.createPersonnage = async (req, res) => {
   let transaction;
