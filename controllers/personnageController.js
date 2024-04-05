@@ -5,6 +5,7 @@ const {
 } = require("../models/personnageModels");
 const Arme = require("../models/armeModels");
 const Image = require("../models/imageModels");
+const Aventure = require("../models/aventureModels");
 const sequelize = require("../db/db");
 
 exports.createPersonnage = async (req, res) => {
@@ -263,3 +264,22 @@ exports.deletePersonnage = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getAventureByPersonnage = async (req, res) => {
+    let transaction;
+    try {
+        const { id } = req.params;
+        transaction = await sequelize.transaction();
+        const aventure = await Aventure.findOne({
+        where: {
+            id_personnage: id,
+        },
+        transaction,
+        });
+        await transaction.commit();
+        res.status(200).json(aventure);
+    } catch (error) {
+        if (transaction) await transaction.rollback();
+        res.status(500).json({ error: error.message });
+    }
+}
