@@ -128,15 +128,20 @@ exports.updateLivre = async (req, res) => {
 };
 
 exports.deleteLivre = async (req, res) => {
+    let transaction;
     try {
         const {id} = req.params;
+        transaction = await sequelize.transaction();
         await Livre.destroy({
             where: {
                 id,
             },
+            transaction,
         });
+        await transaction.commit();
         res.status(200).json({message: "Book deleted"});
     } catch (error) {
+        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
