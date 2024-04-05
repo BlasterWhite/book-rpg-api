@@ -50,7 +50,7 @@ exports.createLivre = async (req, res) => {
         const personnageDefault = await Personnage.create({
             nom: personnage.nom,
             description: personnage.description,
-            id_image: personnageImages.id_image,
+            id_image: personnageImages.id,
             occupation: personnage.occupation,
             apparence: personnage.apparence,
             dexterite: personnage.dexterite,
