@@ -76,21 +76,37 @@ exports.getLivreById = async (req, res) => {
 };
 
 exports.updateLivre = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { titre, resume, id_image, tag, date_sortie } = req.body;
-    await Livre.update(
-      { titre, resume, id_image, tag, date_sortie },
-      {
-        where: {
-          id,
-        },
-      },
-    );
-    res.status(200).json({ message: "Book updated" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    let transaction;
+    try {
+        const {id} = req.params;
+        const {titre, resume, id_image, tag, date_sortie} = req.body;
+        transaction = await sequelize.transaction();
+        const livre = await Livre.update(
+            {titre, resume, tag, date_sortie},
+            {
+                where: {
+                    id,
+                },
+            },
+            transaction
+        );
+        if (id_image) {
+            await Image.update(
+                {image: id_image},
+                {
+                    where: {
+                        id: livre.id_image,
+                    },
+                },
+                transaction
+            );
+        }
+        transaction.commit();
+        res.status(200).json({message: "Book updated"});
+    } catch (error) {
+        if (transaction) await transaction.rollback();
+        res.status(500).json({error: error.message});
+    }
 };
 
 exports.deleteLivre = async (req, res) => {
