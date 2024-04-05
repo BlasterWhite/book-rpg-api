@@ -37,7 +37,7 @@ exports.loginUser = async (req, res) => {
         expiresIn: "24h",
       },
     );
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json({
       token,
       user: {
@@ -82,7 +82,7 @@ exports.createUser = async (req, res) => {
         attributes: ["mail", "nom", "prenom"],
       },
     );
-    transaction.commit();
+    await transaction.commit();
     delete user.dataValues.mot_de_passe;
     res.status(201).json(user);
   } catch (error) {
@@ -99,7 +99,7 @@ exports.getAllUsers = async (req, res) => {
       attributes: ["mail", "nom", "prenom"],
       transaction,
     });
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json(users);
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -116,7 +116,7 @@ exports.getUserById = async (req, res) => {
       attributes: ["mail", "nom", "prenom"],
       transaction,
     }); // SELECT * FROM User WHERE id = id;
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json(user);
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -140,7 +140,7 @@ exports.updateUser = async (req, res) => {
         transaction,
       },
     );
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json({ message: "User updated" });
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -159,7 +159,7 @@ exports.deleteUser = async (req, res) => {
       },
       transaction,
     });
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json({ message: "User deleted" });
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -189,7 +189,7 @@ exports.getAllAventures = async (req, res) => {
         },
       ],
     });
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json(aventures);
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -209,7 +209,7 @@ exports.getAventureById = async (req, res) => {
       },
       transaction,
     });
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json(aventure);
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -229,7 +229,7 @@ exports.getAventureByIdLivre = async (req, res) => {
       },
       transaction,
     });
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json(aventure);
   } catch (error) {
     if (transaction) await transaction.rollback();

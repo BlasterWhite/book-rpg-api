@@ -17,7 +17,7 @@ exports.getAllEquipement = async (req, res) => {
       ],
       transaction,
     });
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json(equipement);
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -43,7 +43,7 @@ exports.getOneEquipement = async (req, res) => {
       ],
       transaction,
     });
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json(equipement);
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -76,7 +76,7 @@ exports.createEquipement = async (req, res) => {
       },
       { transaction },
     );
-    transaction.commit();
+    await transaction.commit();
     res.status(201).json(equipement);
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -104,7 +104,7 @@ exports.updateEquipement = async (req, res) => {
         transaction,
       },
     );
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json({ message: "Equipement updated" });
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -123,7 +123,7 @@ exports.deleteEquipement = async (req, res) => {
       },
       transaction,
     });
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json({ message: "Equipement deleted" });
   } catch (error) {
     if (transaction) await transaction.rollback();

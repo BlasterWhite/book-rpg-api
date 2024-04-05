@@ -92,10 +92,8 @@ exports.getLivreById = async (req, res) => {
 exports.updateLivre = async (req, res) => {
     let transaction;
     try {
-        const {id} = req.params;
-        const {titre, resume, id_image, tag, date_sortie} = req.body;
+        const {id, titre, resume, id_image, tag, date_sortie} = req.body;
         transaction = await sequelize.transaction();
-        // on check si le livre existe
         const livreExist = await Livre.findByPk(id, {transaction});
         if (!livreExist) {
             res.status(404).json({message: "Book not found"});

@@ -17,7 +17,7 @@ exports.getAllArme = async (req, res) => {
       ],
       transaction,
     });
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json(arme);
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -43,7 +43,7 @@ exports.getOneArme = async (req, res) => {
       ],
       transaction,
     });
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json(arme);
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -79,7 +79,7 @@ exports.createArme = async (req, res) => {
         transaction,
       },
     );
-    transaction.commit();
+    await transaction.commit();
     res.status(201).json(arme);
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -108,7 +108,7 @@ exports.updateArme = async (req, res) => {
         transaction,
       },
     );
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json({ message: "Arme updated" });
   } catch (error) {
     if (transaction) await transaction.rollback();
@@ -127,7 +127,7 @@ exports.deleteArme = async (req, res) => {
       },
       transaction,
     });
-    transaction.commit();
+    await transaction.commit();
     res.status(200).json({ message: "Arme deleted" });
   } catch (error) {
     if (transaction) await transaction.rollback();
