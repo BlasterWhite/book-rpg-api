@@ -2,7 +2,8 @@ const Livre = require("../models/livreModels");
 const Image = require("../models/imageModels");
 const sequelize = require("../db/db");
 const Arme = require("../models/armeModels");
-const {Personnage } = require("../models/personnageModels");
+const Equipement = require("../models/equipementModels");
+const {Personnage} = require("../models/personnageModels");
 
 exports.createLivre = async (req, res) => {
     let transaction;
