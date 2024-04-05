@@ -5,7 +5,13 @@ exports.getAllFavoris = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
-    const favoris = await Favoris.findAll({transaction});
+    const {idUser } = req.params;
+    const favoris = await Favoris.findAll({
+      where: {
+        id_utilisateur: idUser,
+      },
+      transaction
+    });
     await transaction.commit();
     res.status(200).json(favoris);
   } catch (error) {
@@ -17,11 +23,12 @@ exports.getAllFavoris = async (req, res) => {
 exports.getFavorisByLivre = async (req, res) => {
   let transaction;
   try {
-    const { idLivre } = req.params;
+    const { idLivre, idUser } = req.params;
     transaction = await sequelize.transaction();
     const favoris = await Favoris.findAll({
       where: {
         id_livre: idLivre,
+        id_utilisateur: idUser,
       },
         transaction,
     });
