@@ -13,8 +13,8 @@ router.delete("/:id", userController.deleteUser);
 router.post("/login", userController.loginUser);
 
 router.get("/:idUser/aventures", userController.getAllAventures);
-router.get("/:idUser/aventures/:idLivre", userController.getAventureByIdLivre);
 router.get("/:idUser/aventures/:idAventure", userController.getAventureById);
+router.get("/:idUser/aventures/livres/:idLivre", userController.getAventureByIdLivre);
 
 router.get("/:idUser/favoris", favorisController.getAllFavoris);
 router.get("/:idUser/favoris/:idLivre", favorisController.getFavorisByLivre);
