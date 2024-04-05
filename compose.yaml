@@ -16,11 +16,14 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     restart: always
+    depends_on:
+      - postgres
 
   postgres:
     image: bigpapoo/r5a05-postgres
     container_name: book-rpg-postgres
     volumes:
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql
       - postgres_data:/var/lib/postgresql/data
     ports:
       - ${POSTGRES_PORT}:5432
