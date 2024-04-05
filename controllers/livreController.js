@@ -10,7 +10,7 @@ exports.createLivre = async (req, res) => {
         let image;
         if (id_image) {
             image = await Image.findByPk(id_image, {
-                transaction,
+                transaction
             });
         }
         if (!image) {
@@ -194,6 +194,7 @@ exports.getAllPopularLivres = async (req, res) => {
                     },
                 ],
                 limit: 10,
+                transaction
             });
             await transaction.commit();
             res.status(200).json(livres);

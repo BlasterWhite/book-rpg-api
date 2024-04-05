@@ -65,7 +65,7 @@ exports.createEquipement = async (req, res) => {
     if (!image) {
       image = await Image.create({
         image: "https://picsum.photos/270/500",
-      });
+      }, {transaction});
     }
     const equipement = await Equipement.create(
       {

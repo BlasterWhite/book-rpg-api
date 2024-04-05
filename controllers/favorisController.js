@@ -2,24 +2,33 @@ const Favoris = require("../models/favorisModels");
 const sequelize = require("../db/db");
 
 exports.getAllFavoris = async (req, res) => {
+  let transaction;
   try {
-    const favoris = await Favoris.findAll();
-    res.json(favoris);
+    transaction = await sequelize.transaction();
+    const favoris = await Favoris.findAll({transaction});
+    await transaction.commit();
+    res.status(200).json(favoris);
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
 
 exports.getFavorisByLivre = async (req, res) => {
+  let transaction;
   try {
     const { idLivre } = req.params;
+    transaction = await sequelize.transaction();
     const favoris = await Favoris.findAll({
       where: {
         id_livre: idLivre,
       },
+        transaction,
     });
-    res.json(favoris);
+    await transaction.commit();
+    res.status(200).json(favoris);
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
@@ -32,9 +41,8 @@ exports.createFavoris = async (req, res) => {
     transaction = await sequelize.transaction();
     const favoris = await Favoris.create({
       id_utilisateur: idUser,
-      id_livre: id_livre,
-      transaction,
-    });
+      id_livre: id_livre
+    }, { transaction });
     await transaction.commit();
     res.status(201).json(favoris);
   } catch (error) {
@@ -49,7 +57,7 @@ exports.updateFavoris = async (req, res) => {
     const { idUser } = req.params;
     const { id_livre } = req.body;
     transaction = await sequelize.transaction();
-    const favoris = await Favoris.findByPk(req.params.id);
+    const favoris = await Favoris.findByPk(req.params.id, { transaction });
     await favoris.update(
       {
         id_utilisateur: idUser,
@@ -60,6 +68,7 @@ exports.updateFavoris = async (req, res) => {
     await transaction.commit();
     res.status(200).json(favoris);
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
@@ -81,6 +90,7 @@ exports.deleteFavoris = async (req, res) => {
       .status(204)
       .json({ message: `Favoris for book ${req.params.idLivre} deleted` });
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
   }
 };
