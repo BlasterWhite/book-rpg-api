@@ -32,9 +32,7 @@ exports.createLivre = async (req, res) => {
         // on vérifie si l'imageLivre du personnage
         let personnageImages;
         if (personnage.id_image) {
-            personnageImages = await Image.findByPk({
-                id: personnage.id_image
-            }, {
+            personnageImages = await Image.findByPk(personnage.id_image, {
                 transaction
             });
         }
@@ -95,14 +93,14 @@ exports.createLivre = async (req, res) => {
             );
         }
 
-        await personnage.addArme(armeParDefaut, {transaction});
+        await personnageDefault.addArme(armeParDefaut, {transaction});
         const livre = await Livre.create({
                 titre,
                 resume,
                 id_image: imageLivre.id,
                 tag,
                 date_sortie,
-                id_personnage_default: personnage.id,
+                id_personnage_default: personnageDefault.id,
             },
             {transaction});
         await transaction.commit();
