@@ -248,7 +248,7 @@ exports.getAllPopularLivres = async (req, res) => {
     try {
         transaction = await sequelize.transaction();
         const livres = await sequelize.query(
-            `SELECT l.titre, l.resume, l.id_image, l.tag, l.date_sortie, l.id, *
+            `SELECT l.id, l.titre, l.resume, l.id_image, l.tag, l.date_sortie
              FROM bookrpg.livre l
                       JOIN bookrpg.aventure a ON l.id = a.id_livre
              GROUP BY l.id
