@@ -32,7 +32,7 @@ exports.createPersonnage = async (req, res) => {
       armeParDefaut = await Arme.create(
         {
           titre: "Poing",
-          description: "Vos magnifiques poings durs",
+          description: "L'armes la plus vieille du monde !",
           id_image: image.id,
           degats: 2,
           durabilite: -1,
