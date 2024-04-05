@@ -105,7 +105,7 @@ exports.updateArme = async (req, res) => {
         where: {
           id,
         },
-        transaction,
+        transaction
       },
     );
     await transaction.commit();

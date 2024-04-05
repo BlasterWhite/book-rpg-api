@@ -128,7 +128,7 @@ exports.createSection = async (req, res) => {
                 if (!search) {
                     res.status(404).json({error: "Destination not found"});
                 }
-                section.addSections(search);
+                section.addSections(search, {transaction});
             }
 
             const sectionGagne = await Section.findByPk(resultat.gagne, {
@@ -181,7 +181,7 @@ exports.createSection = async (req, res) => {
                 if (!search) {
                     res.status(404).json({error: "Destination not found"});
                 }
-                section.addSections(search);
+                section.addSections(search, {transaction});
             }
         } else {
             res.status(400).json({error: "Wrong type"});
