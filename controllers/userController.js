@@ -202,7 +202,7 @@ exports.getAventureById = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const { idUser, idAventure } = req.params;
-    const aventure = await Aventure.findOne({
+    const aventure = await Aventure.findAll({
       where: {
         id: idAventure,
         id_utilisateur: idUser,
