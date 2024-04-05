@@ -95,6 +95,12 @@ exports.updateLivre = async (req, res) => {
         const {id} = req.params;
         const {titre, resume, id_image, tag, date_sortie} = req.body;
         transaction = await sequelize.transaction();
+        // on check si le livre existe
+        const livreExist = await Livre.findByPk(id, {transaction});
+        if (!livreExist) {
+            res.status(404).json({message: "Book not found"});
+            return;
+        }
         const livre = await Livre.update(
             {titre, resume, tag, date_sortie},
             {
@@ -115,7 +121,7 @@ exports.updateLivre = async (req, res) => {
                 transaction
             );
         }
-        transaction.commit();
+        await transaction.commit();
         res.status(200).json({message: "Book updated"});
     } catch (error) {
         if (transaction) await transaction.rollback();
@@ -186,11 +192,11 @@ exports.getAllPopularLivres = async (req, res) => {
                 ],
                 limit: 10,
             });
-            transaction.commit();
+            await transaction.commit();
             res.status(200).json(livres);
             return;
         }
-        transaction.commit();
+        await transaction.commit();
         res.status(200).json(livres);
     } catch (error) {
         if (transaction) await transaction.rollback();
