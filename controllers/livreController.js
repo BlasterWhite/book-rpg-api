@@ -180,13 +180,12 @@ exports.updateLivre = async (req, res) => {
             },
             transaction
         );
-        const livre = await Livre.findByPk(id, {transaction});
         if (id_image) {
-            await Image.update(
-                {image: id_image},
+            await Livre.update(
+                {id_image: id_image},
                 {
                     where: {
-                        id: livre.id_image,
+                        id,
                     },
                 },
                 transaction
