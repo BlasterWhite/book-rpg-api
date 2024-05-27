@@ -254,7 +254,19 @@ exports.getAllPopularLivres = async (req, res) => {
              ORDER BY COUNT(DISTINCT a.id_utilisateur) DESC LIMIT 10;`,
             {type: sequelize.QueryTypes.SELECT, transaction},
         );
+
+        for (let i = 0; i < livres.length; i++) {
+            livres[i].image = await Image.findOne({
+                where: {
+                    id: livres[i].id_image,
+                },
+                attributes: ["image"],
+                transaction
+            });
+        }
+
         // si le retour est un tableau vide on retourne la liste des livres
+        console.log(livres.length)
         if (livres.length === 0) {
             const livres = await Livre.findAll({
                 order: [["date_sortie", "DESC"]],
