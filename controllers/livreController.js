@@ -145,7 +145,6 @@ exports.getLivreById = async (req, res) => {
                 {
                     model: Image,
                     as: "image",
-                    attributes: ["image"],
                 },
             ],
             transaction
