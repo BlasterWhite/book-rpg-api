@@ -172,7 +172,7 @@ exports.updateLivre = async (req, res) => {
             res.status(404).json({message: "Book not found"});
             return;
         }
-        const livre = await Livre.update(
+        await Livre.update(
             {titre, resume, tag, date_sortie},
             {
                 where: {
@@ -181,6 +181,7 @@ exports.updateLivre = async (req, res) => {
             },
             transaction
         );
+        const livre = await Livre.findByPk(id, {transaction});
         if (id_image) {
             await Image.update(
                 {image: id_image},
