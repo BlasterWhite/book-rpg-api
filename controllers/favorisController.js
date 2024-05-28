@@ -1,7 +1,7 @@
 const Favoris = require("../models/favorisModels");
 const sequelize = require("../db/db");
-const User = require("../models/userModels");
 const Livre = require("../models/livreModels");
+const Image = require("../models/imageModels");
 
 exports.getAllFavoris = async (req, res) => {
     let transaction;
