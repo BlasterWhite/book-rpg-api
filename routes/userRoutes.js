@@ -16,10 +16,10 @@ router.get("/:idUser/aventures", userController.getAllAventures);
 router.get("/:idUser/aventures/:idAventure", userController.getAventureById);
 router.get("/:idUser/aventures/livres/:idLivre", userController.getAventureByIdLivre);
 
-router.get("/:idUser/favoris", favorisController.getAllFavoris);
-router.get("/:idUser/favoris/:idLivre", favorisController.getFavorisByLivre);
-router.post("/:idUser/favoris", favorisController.createFavoris);
-router.put("/:idUser/favoris/:id", favorisController.updateFavoris);
-router.delete("/:idUser/favoris/:idLivre", favorisController.deleteFavoris);
+router.get("/favoris", favorisController.getAllFavoris);
+router.get("/favoris/:idLivre", favorisController.getFavorisByLivre);
+router.post("/favoris", favorisController.createFavoris);
+router.put("/favoris/:id", favorisController.updateFavoris);
+router.delete("/favoris/:idLivre", favorisController.deleteFavoris);
 
 module.exports = router;

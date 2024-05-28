@@ -55,7 +55,6 @@ app.use((req, res, next) => {
                     return res.status(403).json({message: "Token invalide"});
                 }
                 req.user = decoded;
-                console.log(req.user)
                 next();
             });
         }

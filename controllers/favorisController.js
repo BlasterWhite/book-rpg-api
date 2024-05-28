@@ -5,7 +5,7 @@ exports.getAllFavoris = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
-    const {idUser } = req.params;
+    const idUser = req.user.id;
     const favoris = await Favoris.findAll({
       where: {
         id_utilisateur: idUser,
@@ -23,7 +23,7 @@ exports.getAllFavoris = async (req, res) => {
 exports.getFavorisByLivre = async (req, res) => {
   let transaction;
   try {
-    const { idLivre, idUser } = req.params;
+    const idUser = req.user.id;
     transaction = await sequelize.transaction();
     const favoris = await Favoris.findAll({
       where: {
@@ -43,7 +43,7 @@ exports.getFavorisByLivre = async (req, res) => {
 exports.createFavoris = async (req, res) => {
   let transaction;
   try {
-    const { idUser } = req.params;
+    const idUser = req.user.id;
     const { id_livre } = req.body;
     transaction = await sequelize.transaction();
     const favoris = await Favoris.create({
@@ -61,7 +61,7 @@ exports.createFavoris = async (req, res) => {
 exports.updateFavoris = async (req, res) => {
   let transaction;
   try {
-    const { idUser } = req.params;
+    const idUser = req.user.id;
     const { id_livre } = req.body;
     transaction = await sequelize.transaction();
     const favoris = await Favoris.findByPk(req.params.id, { transaction });
@@ -84,10 +84,12 @@ exports.deleteFavoris = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
+    const idUser = req.user.id;
+    const { idLivre } = req.params;
     await Favoris.destroy({
       where: {
-        id_utilisateur: req.params.idUser,
-        id_livre: req.params.idLivre,
+        id_utilisateur: idUser,
+        id_livre: idLivre,
       },
       transaction,
     });
@@ -95,7 +97,7 @@ exports.deleteFavoris = async (req, res) => {
     await transaction.commit();
     res
       .status(204)
-      .json({ message: `Favoris for book ${req.params.idLivre} deleted` });
+      .json({ message: `Favoris for book ${idLivre} deleted` });
   } catch (error) {
     if (transaction) await transaction.rollback();
     res.status(500).json({ error: error.message });
