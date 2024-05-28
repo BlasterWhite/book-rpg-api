@@ -12,9 +12,9 @@ router.delete("/:id", userController.deleteUser);
 
 router.post("/login", userController.loginUser);
 
-router.get("/:idUser/aventures", userController.getAllAventures);
-router.get("/:idUser/aventures/:idAventure", userController.getAventureById);
-router.get("/:idUser/aventures/livres/:idLivre", userController.getAventureByIdLivre);
+router.get("/aventures", userController.getAllAventures);
+router.get("/aventures/:idAventure", userController.getAventureById);
+router.get("/aventures/livres/:idLivre", userController.getAventureByIdLivre);
 
 router.get("/favoris", favorisController.getAllFavoris);
 router.get("/favoris/:idLivre", favorisController.getFavorisByLivre);
