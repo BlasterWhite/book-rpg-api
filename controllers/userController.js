@@ -116,9 +116,11 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
   let transaction;
   try {
+    console.log(req.user)
     transaction = await sequelize.transaction();
-    const { id } = req.params;
-    if (id !== req.user.id && req.user.permission !== "admin") {
+    const { id } = req.params
+    console.log(id, req.user.id, req.user.permission)
+    if (String(id) !== String(req.user.id) && req.user.permission !== "admin") {
         return res.status(403).json({ message: "You don't have the rights for this action" });
     }
     const user = await User.findByPk(id, {
@@ -138,7 +140,7 @@ exports.updateUser = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const { id } = req.params;
-    if (id !== req.user.id && req.user.permission !== "admin") {
+    if (String(id) !== String(req.user.id) && req.user.permission !== "admin") {
         return res.status(403).json({ message: "You don't have the rights for this action" });
     }
     const { mail, nom, prenom, password } = req.body;
@@ -165,7 +167,7 @@ exports.deleteUser = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const { id } = req.params;
-    if (id !== req.user.id && req.user.permission !== "admin") {
+    if (String(id) !== String(req.user.id) && req.user.permission !== "admin") {
         return res.status(403).json({ message: "You don't have the rights for this action" });
     }
 

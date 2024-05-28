@@ -24,6 +24,7 @@ exports.getFavorisByLivre = async (req, res) => {
   let transaction;
   try {
     const idUser = req.user.id;
+    const { idLivre } = req.params;
     transaction = await sequelize.transaction();
     const favoris = await Favoris.findAll({
       where: {
@@ -93,7 +94,6 @@ exports.deleteFavoris = async (req, res) => {
       },
       transaction,
     });
-    // res.json({ message: `Favoris for book ${req.params.idLivre} deleted` });
     await transaction.commit();
     res
       .status(204)
