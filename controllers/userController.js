@@ -82,7 +82,7 @@ exports.createUser = async (req, res) => {
       },
       {
         transaction,
-        attributes: ["mail", "nom", "prenom"],
+        attributes: ["mail", "nom", "prenom", "permission"],
       },
     );
     await transaction.commit();
@@ -98,8 +98,11 @@ exports.getAllUsers = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
+    if (req.user.permission !== "admin") {
+        return res.status(403).json({ message: "You don't have the rights for this action" });
+    }
     const users = await User.findAll({
-      attributes: ["mail", "nom", "prenom"],
+      attributes: ["mail", "nom", "prenom", "permission"],
       transaction,
     });
     await transaction.commit();
@@ -115,6 +118,9 @@ exports.getUserById = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const { id } = req.params;
+    if (id !== req.user.id && req.user.permission !== "admin") {
+        return res.status(403).json({ message: "You don't have the rights for this action" });
+    }
     const user = await User.findByPk(id, {
       attributes: ["mail", "nom", "prenom"],
       transaction,
@@ -132,6 +138,9 @@ exports.updateUser = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const { id } = req.params;
+    if (id !== req.user.id && req.user.permission !== "admin") {
+        return res.status(403).json({ message: "You don't have the rights for this action" });
+    }
     const { mail, nom, prenom, password } = req.body;
     const mot_de_passe_crypte = await bcrypt.hash(password, 10);
     await User.update(
@@ -156,6 +165,10 @@ exports.deleteUser = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const { id } = req.params;
+    if (id !== req.user.id && req.user.permission !== "admin") {
+        return res.status(403).json({ message: "You don't have the rights for this action" });
+    }
+
     await User.destroy({
       where: {
         id,
@@ -174,7 +187,12 @@ exports.getAllAventures = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();
-    const { idUser } = req.params;
+    const { idUser } = req.params
+
+    if (idUser !== req.user.id && req.user.permission !== "admin") {
+        return res.status(403).json({ message: "You don't have the rights for this action" });
+    }
+
     const aventures = await Aventure.findAll({
       where: {
         id_utilisateur: idUser,

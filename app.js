@@ -5,7 +5,6 @@ const cors = require("cors");
 
 const userRoutes = require("./routes/userRoutes");
 const livreRoutes = require("./routes/livreRoutes");
-const sectionRoutes = require("./routes/sectionRoutes");
 const personnageRoutes = require("./routes/personnageRoutes");
 const imageRoutes = require("./routes/imageRoutes");
 const aventureRoutes = require("./routes/aventureRoutes");
@@ -42,9 +41,7 @@ app.use((req, res, next) => {
                     req.path.includes("news") ||
                     req.path.includes("images")) &&
                 req.method === "GET") ||
-            (req.path.includes("/users") &&
-                (!req.path.includes("favoris") || !req.path.includes("aventures")) &&
-                req.method === "POST")) {
+            (req.path.includes("/login") && req.method === "POST")) {
             next();
         } else {
             const token = req.headers["authorization"];
@@ -67,16 +64,63 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    // ici on récupère le res et on va récupérer le user et dans le user la permission
-    // console.log(req.user.permission + " " + req.user.email)
+    if (((req.path === "/livres" ||
+                req.path.includes("popular") ||
+                req.path.includes("news") ||
+                req.path.includes("images")) &&
+            req.method === "GET") ||
+        (req.path.includes("/login") && req.method === "POST")) { // le login
+        next();
+    }
 
+    if (req.user.permission === "admin") { // un admin à tous les droits
+        next();
+    }
+
+    // le writer à tout les droit sauf /users ou il a la perm par défault
+    if (req.user.permission === "writer") {
+        if (req.path === "/users") {
+            return res.status(403).json({message: "Vous n'avez pas les droits pour cette action"});
+        }
+        next();
+    }
+
+    const body = {message: "Vous n'avez pas les droits pour cette action"};
+    const path = `/${req.path.split("/")[1]}`;
+
+    switch (path) {
+        case '/users':
+            if (["GET", "PUT", "DELETE"].includes(req.method) && req.path !== "/users/:id") {
+                return res.status(403).json(body);
+            }
+            break
+        case '/livres':
+            if (["POST", "PUT", "DELETE"].includes(req.method)) {
+                return res.status(403).json(body);
+            }
+            break
+        case '/images':
+            if (["POST", "PUT", "DELETE"].includes(req.method)) {
+                return res.status(403).json(body);
+            }
+            break
+        case '/armes':
+            if (["POST", "PUT", "DELETE"].includes(req.method)) {
+                return res.status(403).json(body);
+            }
+            break
+        case '/equipements':
+            if (["POST", "PUT", "DELETE"].includes(req.method)) {
+                return res.status(403).json(body);
+            }
+            break
+    }
 
     next();
 })
 
 app.use("/users", userRoutes);
 app.use("/livres", livreRoutes);
-app.use("/sections", sectionRoutes);
 app.use("/personnages", personnageRoutes);
 app.use("/images", imageRoutes);
 app.use("/aventures", aventureRoutes);
