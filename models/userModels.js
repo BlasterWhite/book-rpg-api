@@ -22,7 +22,7 @@ const User = sequelize.define(
         },
         permission: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         }
     },
     {
