@@ -18,7 +18,6 @@ exports.loginUser = async (req, res) => {
       transaction,
       attributes: ["id", "mail", "mot_de_passe", "nom", "prenom", "permission"],
     });
-    console.log(user.permission,password, user.mot_de_passe)
     if (!user) {
       return res.status(404).json({ error: "User not found !" });
     }
@@ -116,10 +115,8 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
   let transaction;
   try {
-    console.log(req.user)
     transaction = await sequelize.transaction();
     const { id } = req.params
-    console.log(id, req.user.id, req.user.permission)
     if (String(id) !== String(req.user.id) && req.user.permission !== "admin") {
         return res.status(403).json({ message: "You don't have the rights for this action" });
     }
