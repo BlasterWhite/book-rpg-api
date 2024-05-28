@@ -55,22 +55,25 @@ app.use((req, res, next) => {
                     return res.status(403).json({message: "Token invalide"});
                 }
                 req.user = decoded;
+                console.log(req.user)
                 next();
             });
         }
     } catch (error) {
         req.user = null;
+        console.log(error)
         next();
     }
 });
 
 app.use((req, res, next) => {
     if (req.byPass || !req.user) { // le login
-        next();
+        return next();
     }
 
+    console.log(req.byPass, req.user, "coucou")
     if (req.user.permission === "admin") { // un admin à tous les droits
-        next();
+        return next();
     }
 
     // le writer à tout les droit sauf /users ou il a la perm par défault
@@ -78,7 +81,7 @@ app.use((req, res, next) => {
         if (req.path === "/users") {
             return res.status(403).json({message: "Vous n'avez pas les droits pour cette action"});
         }
-        next();
+        return next();
     }
 
     const body = {message: "Vous n'avez pas les droits pour cette action"};
