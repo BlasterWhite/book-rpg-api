@@ -7,10 +7,6 @@ const env = {
   database: process.env.POSTGRES_DB,
 };
 
-console.log(
-  `postgres://${env.user}:${env.password}@${env.host}:${env.port}/${env.database}`,
-);
-
 const sequelize = new Sequelize(
   `postgres://${env.user}:${env.password}@${env.host}:${env.port}/${env.database}`,
   {

@@ -272,7 +272,7 @@ exports.getAllSections = async (req, res) => {
                     try {
                         section.resultat.condition = JSON.parse(section.resultat.condition);
                     } catch (error) {
-                        console.log(section.resultat.condition);
+                        console.error(section.resultat.condition);
                     }
                 }
             }
