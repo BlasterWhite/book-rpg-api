@@ -16,8 +16,9 @@ exports.loginUser = async (req, res) => {
         mail: email,
       },
       transaction,
-      attributes: ["id", "mail", "mot_de_passe", "nom", "prenom"],
+      attributes: ["id", "mail", "mot_de_passe", "nom", "prenom", "permission"],
     });
+    console.log(user.permission,password, user.mot_de_passe)
     if (!user) {
       return res.status(404).json({ error: "User not found !" });
     }
@@ -31,6 +32,7 @@ exports.loginUser = async (req, res) => {
       {
         id: user.id,
         email: user.mail,
+        permission: user.permission
       },
       "sklLeevR0FHz5ha%2ys#",
       {
@@ -45,6 +47,7 @@ exports.loginUser = async (req, res) => {
         email: user.mail,
         lastname: user.nom,
         firstname: user.prenom,
+        permission: user.permission
       },
     });
   } catch (error) {

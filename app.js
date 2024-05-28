@@ -36,30 +36,43 @@ app.use(
 const secretKey = "sklLeevR0FHz5ha%2ys#";
 
 app.use((req, res, next) => {
-    if (((req.path === "/livres" ||
-                req.path.includes("popular") ||
-                req.path.includes("news") ||
-                req.path.includes("images")) &&
-            req.method === "GET") ||
-        (req.path.includes("/users") &&
-            (!req.path.includes("favoris") || !req.path.includes("aventures")) &&
-            req.method === "POST")) {
-        next();
-    } else {
-        const token = req.headers["authorization"];
-        if (!token) {
-            return res.status(401).json({message: "Token non fourni"});
-        }
-
-        jwt.verify(token, secretKey, (err, decoded) => {
-            if (err) {
-                return res.status(403).json({message: "Token invalide"});
-            }
-            req.user = decoded;
+    try {
+        if (((req.path === "/livres" ||
+                    req.path.includes("popular") ||
+                    req.path.includes("news") ||
+                    req.path.includes("images")) &&
+                req.method === "GET") ||
+            (req.path.includes("/users") &&
+                (!req.path.includes("favoris") || !req.path.includes("aventures")) &&
+                req.method === "POST")) {
             next();
-        });
+        } else {
+            const token = req.headers["authorization"];
+            if (!token) {
+                return res.status(401).json({message: "Token non fourni"});
+            }
+
+            jwt.verify(token, secretKey, (err, decoded) => {
+                if (err) {
+                    return res.status(403).json({message: "Token invalide"});
+                }
+                req.user = decoded;
+                next();
+            });
+        }
+    } catch (error) {
+        req.user = null;
+        next();
     }
 });
+
+app.use((req, res, next) => {
+    // ici on récupère le res et on va récupérer le user et dans le user la permission
+    // console.log(req.user.permission + " " + req.user.email)
+
+
+    next();
+})
 
 app.use("/users", userRoutes);
 app.use("/livres", livreRoutes);
