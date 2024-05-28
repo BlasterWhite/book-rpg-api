@@ -42,6 +42,7 @@ app.use((req, res, next) => {
                     req.path.includes("images")) &&
                 req.method === "GET") ||
             (req.path.includes("/login") && req.method === "POST")) {
+            req.byPass = true;
             next();
         } else {
             const token = req.headers["authorization"];
@@ -64,12 +65,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    if (((req.path === "/livres" ||
-                req.path.includes("popular") ||
-                req.path.includes("news") ||
-                req.path.includes("images")) &&
-            req.method === "GET") ||
-        (req.path.includes("/login") && req.method === "POST")) { // le login
+    if (req.byPass) { // le login
         next();
     }
 
