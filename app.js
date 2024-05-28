@@ -65,7 +65,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    if (req.byPass) { // le login
+    if (req.byPass || !req.user) { // le login
         next();
     }
 
