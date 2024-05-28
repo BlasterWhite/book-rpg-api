@@ -71,7 +71,6 @@ app.use((req, res, next) => {
         return next();
     }
 
-    console.log(req.byPass, req.user, "coucou")
     if (req.user.permission === "admin") { // un admin à tous les droits
         return next();
     }
