@@ -86,11 +86,6 @@ app.use((req, res, next) => {
     const path = `/${req.path.split("/")[1]}`;
 
     switch (path) {
-        case '/users':
-            if (["GET", "PUT", "DELETE"].includes(req.method) && req.path !== "/users/:id") {
-                return res.status(403).json(body);
-            }
-            break
         case '/livres':
             if (["POST", "PUT", "DELETE"].includes(req.method)) {
                 return res.status(403).json(body);
