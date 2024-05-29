@@ -418,9 +418,8 @@ exports.updateSection = async (req, res) => {
                     return;
                 }
 
-                queryRes = await updatedSection.getResultat({transaction}); // Trouvez le résultat associé
-                if (queryRes) {
-                    await queryRes.destroy({transaction}); // Supprimez le résultat s'il existe
+                if (updatedSection.resultat) {
+                    await updatedSection.resultat.destroy({transaction}); // Supprimez le résultat s'il existe
                 }
 
                 resultat.id_section = updatedSection.id;
