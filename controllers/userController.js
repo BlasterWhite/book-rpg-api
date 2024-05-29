@@ -16,7 +16,7 @@ exports.loginUser = async (req, res) => {
         mail: email,
       },
       transaction,
-      attributes: ["id", "mail", "mot_de_passe", "nom", "prenom", "permission"],
+      attributes: ["id", "mail", "mot_de_passe", "nom", "prenom", "permission", "creation_date"],
     });
     if (!user) {
       return res.status(404).json({ error: "User not found !" });
@@ -46,7 +46,8 @@ exports.loginUser = async (req, res) => {
         email: user.mail,
         lastname: user.nom,
         firstname: user.prenom,
-        permission: user.permission
+        permission: user.permission,
+        creation_date: user.creation_date
       },
     });
   } catch (error) {
@@ -81,7 +82,7 @@ exports.createUser = async (req, res) => {
       },
       {
         transaction,
-        attributes: ["mail", "nom", "prenom", "permission"],
+        attributes: ["mail", "nom", "prenom", "permission", "creation_date"],
       },
     );
     await transaction.commit();
@@ -101,7 +102,7 @@ exports.getAllUsers = async (req, res) => {
         return res.status(403).json({ message: "You don't have the rights for this action" });
     }
     const users = await User.findAll({
-      attributes: ["mail", "nom", "prenom", "permission"],
+      attributes: ["mail", "nom", "prenom", "permission", "creation_date"],
       transaction,
     });
     await transaction.commit();
@@ -121,7 +122,7 @@ exports.getUserById = async (req, res) => {
         return res.status(403).json({ message: "You don't have the rights for this action" });
     }
     const user = await User.findByPk(id, {
-      attributes: ["mail", "nom", "prenom"],
+      attributes: ["mail", "nom", "prenom", "creation_date"],
       transaction,
     }); // SELECT * FROM User WHERE id = id;
     await transaction.commit();
@@ -201,7 +202,7 @@ exports.getAllAventures = async (req, res) => {
         {
           model: User,
           as: "utilisateur",
-          attributes: ["mail", "nom", "prenom"],
+          attributes: ["mail", "nom", "prenom", "creation_date"],
         },
         {
           model: Personnage,

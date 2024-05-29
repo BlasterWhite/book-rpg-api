@@ -23,6 +23,10 @@ const User = sequelize.define(
         permission: {
             type: DataTypes.STRING,
             allowNull: true,
+        },
+        creation_date: {
+            type: DataTypes.DATE,
+            allowNull: true,
         }
     },
     {
