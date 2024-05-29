@@ -350,7 +350,16 @@ exports.updateSection = async (req, res) => {
                 id_livre: idLivre,
                 id: idSection,
             },
-            include: [{model: Resultat, as: "resultat"}],
+            include: [
+                {
+                    model: Resultat,
+                    as: "resultat"
+                },
+                {
+                    model: Section,
+                    as: "sections"
+                }
+            ],
             transaction,
         });
 
@@ -359,36 +368,37 @@ exports.updateSection = async (req, res) => {
             return;
         }
 
-        if (Array.isArray(destinations)) {
-            if (destinations.length > 0) {
-                const nbDestinations = await updatedSection.getSections();
-                if (nbDestinations.length > 0) {
-                    await updatedSection.setSections(null, {transaction});
-                }
+        if (Array.isArray(destinations) && destinations.length > 0) {
+            if (updatedSection.sections.length > 0) {
+                await updatedSection.setSections(null, {transaction});
+            }
 
-                for (const destination of destinations) {
-                    const search = await Section.findOne({
-                        where: {
-                            id_livre: idLivre,
-                            id: destination,
-                        },
-                        transaction,
-                    });
-                    if (search === null) {
-                        res.status(404).json({error: "Destination not found"});
-                    }
-                    updatedSection.addSections(search, {transaction});
+            for (const destination of destinations) {
+                const search = await Section.findOne({
+                    where: {
+                        id_livre: idLivre,
+                        id: destination,
+                    },
+                    transaction,
+                });
+                if (search === null) {
+                    res.status(404).json({error: "Destination not found"});
+                    return;
                 }
+                updatedSection.addSections(search, {transaction});
             }
         }
         let queryRes;
+        if (type === "none") {
+            res.status(400).json({error: "Type none is not allowed for update"});
+            return;
+        }
+
         switch (type) {
-            case "none":
-                res.status(400).json({error: "Type none is not allowed for update"});
-                break;
             case "des":
                 if (typeof resultat === "undefined") {
                     res.status(400).json({error: "Type choix must not have resultat"});
+                    return;
                 }
 
                 if (resultat.type_condition !== "JSON") {
@@ -398,20 +408,13 @@ exports.updateSection = async (req, res) => {
 
                 for (const key in resultat.condition) {
                     if (!Array.isArray(resultat.condition[key])) {
-                        res
-                            .status(400)
-                            .json({error: "Type condition must be a list of integer"});
+                        res.status(400).json({error: "Type condition must be a list of integer"});
                         return;
                     }
                 }
 
-                if (
-                    typeof resultat.gagne !== "number" ||
-                    typeof resultat.perd !== "number"
-                ) {
-                    res
-                        .status(400)
-                        .json({error: "Type gagne and perd must be integer"});
+                if (typeof resultat.gagne !== "number" || typeof resultat.perd !== "number") {
+                    res.status(400).json({error: "Type gagne and perd must be integer"});
                     return;
                 }
 
@@ -428,11 +431,12 @@ exports.updateSection = async (req, res) => {
                     gagne: resultat.gagne,
                     perd: resultat.perd,
                 }, {transaction});
-                break;
+                break
             case "enigme":
                 // on vérifie si resultat est défini
                 if (typeof resultat === "undefined") {
                     res.status(400).json({error: "Type choix must not have resultat"});
+                    return;
                 }
 
                 if (resultat.type_condition !== "text") {
@@ -440,13 +444,8 @@ exports.updateSection = async (req, res) => {
                     return;
                 }
 
-                if (
-                    typeof resultat.gagne !== "number" ||
-                    typeof resultat.perd !== "number"
-                ) {
-                    res
-                        .status(400)
-                        .json({error: "Type gagne and perd must be integer"});
+                if (typeof resultat.gagne !== "number" || typeof resultat.perd !== "number") {
+                    res.status(400).json({error: "Type gagne and perd must be integer"});
                     return;
                 }
 
@@ -469,6 +468,7 @@ exports.updateSection = async (req, res) => {
             case "combat":
                 if (typeof resultat === "undefined") {
                     res.status(400).json({error: "Type choix must not have resultat"});
+                    return;
                 }
 
                 if (typeof resultat.type_condition !== "number") {
@@ -485,20 +485,13 @@ exports.updateSection = async (req, res) => {
                 ];
                 // on verifie que la condition soit égàlé à un des attributs
                 if (!personnageAttributs.includes(resultat.condition.toLowerCase())) {
-                    res
-                        .status(400)
-                        .json({error: "Type condition must be in personnage attributs"});
+                    res.status(400).json({error: "Type condition must be in personnage attributs"});
                     return;
                 }
                 resultat.condition = resultat.condition.toLowerCase();
 
-                if (
-                    typeof resultat.gagne !== "number" ||
-                    typeof resultat.perd !== "number"
-                ) {
-                    res
-                        .status(400)
-                        .json({error: "Type gagne and perd must be integer"});
+                if (typeof resultat.gagne !== "number" || typeof resultat.perd !== "number") {
+                    res.status(400).json({error: "Type gagne and perd must be integer"});
                     return;
                 }
 
@@ -524,16 +517,12 @@ exports.updateSection = async (req, res) => {
         }
 
         if (event) {
-            const events = await updatedSection.getEvents();
-            for (const e of events) {
-                await Event.destroy({
-                    where: {
-                        id_section: idSection,
-                        id: e.id,
-                    },
-                    transaction,
-                });
-            }
+            await Event.destroy({
+                where: {
+                    id_section: idSection,
+                },
+                transaction,
+            });
         }
 
         for (const e of event) {
