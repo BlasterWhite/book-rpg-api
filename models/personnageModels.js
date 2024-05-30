@@ -134,6 +134,15 @@ Equipement.belongsToMany(Personnage, {
     foreignKey: "id_equipement",
 });
 
+Personnage.belongsTo(PersonnageHistory, {
+    foreignKey: "id_personnage",
+    as: "history",
+});
+PersonnageHistory.belongsTo(Personnage, {
+    foreignKey: "id_personnage",
+    as: "personnage",
+});
+
 Personnage.getAttributes = () => {
     return [
         "nom",

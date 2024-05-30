@@ -8,6 +8,7 @@ const Image = require("../models/imageModels");
 const Aventure = require("../models/aventureModels");
 const sequelize = require("../db/db");
 const Equipement = require("../models/equipementModels");
+const PersonnageHistory = require("../models/PersonnageHistoryModel");
 
 
 exports.createPersonnage = async (req, res) => {
@@ -28,6 +29,7 @@ exports.createPersonnage = async (req, res) => {
                     titre: "Poing",
                 },
                 defaults: {
+                    titre: "Poing",
                     description: "L'armes la plus vieille du monde !",
                     id_image: image.id,
                     degats: 2,
@@ -206,6 +208,13 @@ exports.deletePersonnage = async (req, res) => {
             });
 
             await AssociationEquipementPersonnage.destroy({
+                where: {
+                    id_personnage: id,
+                },
+                transaction: t,
+            });
+
+            await PersonnageHistory.destroy({
                 where: {
                     id_personnage: id,
                 },
