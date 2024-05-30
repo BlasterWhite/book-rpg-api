@@ -5,6 +5,7 @@ const favorisController = require("../controllers/favorisController");
 const router = express.Router();
 
 router.post("/login", userController.loginUser);
+router.post("/", userController.registerUser);
 
 router.get("/aventures", userController.getAllAventures);
 router.get("/aventures/:idAventure", userController.getAventureById);
@@ -18,7 +19,6 @@ router.delete("/favoris/:idLivre", favorisController.deleteFavoris);
 
 router.get("/", userController.getAllUsers);
 router.get("/:id", userController.getUserById);
-router.post("/", userController.createUser);
 router.put("/:id", userController.updateUser);
 router.delete("/:id", userController.deleteUser);
 
