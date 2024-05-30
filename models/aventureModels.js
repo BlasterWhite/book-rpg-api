@@ -1,4 +1,4 @@
-const {DataTypes} = require("sequelize");
+const {DataTypes, Sequelize} = require("sequelize");
 const sequelize = require("../db/db");
 const User = require("./userModels");
 const Livre = require("./livreModels");
@@ -44,6 +44,11 @@ const Aventure = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        updated_at: {
+            type: 'TIMESTAMP',
+            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+            allowNull: true,
+        }
     },
     {
         schema: "bookrpg",
