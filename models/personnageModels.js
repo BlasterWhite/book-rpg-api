@@ -4,6 +4,7 @@ const sequelize = require("../db/db");
 const Armes = require("./armeModels");
 const Image = require("./imageModels");
 const Equipement = require("./equipementModels");
+const PersonnageHistory = require("./PersonnageHistoryModel");
 
 const Personnage = sequelize.define(
     "personnage",
