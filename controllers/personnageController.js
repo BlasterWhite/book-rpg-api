@@ -142,9 +142,30 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                 };
             }
 
+            const personnageHistory = await PersonnageHistory.findOrCreate({
+                where: {
+                    id_personnage: id,
+                },
+                defaults: {
+                    id_personnage: id,
+                },
+                transaction: t,
+            });
+
+            const personnageHistoryEvents = personnageHistory.events;
+
             for (const event of events) {
                 const {which, id, type, operation, value} = event;
-                console.log(which)
+
+                let isEventAlreadyExists = false;
+                for (const personnageHistoryEvent of personnageHistoryEvents) {
+                    if (id === personnageHistoryEvent.id) {
+                        isEventAlreadyExists = true;
+                        break;
+                    }
+                }
+                if (isEventAlreadyExists) continue; // on ne traite pas les événements déjà traités
+
                 if (which === "attribute") {
                     if (operation === "add") {
                         await personnage.increment(type, {by: value, transaction: t});
@@ -152,7 +173,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         await personnage.decrement(type, {by: value, transaction: t});
                     }
                 } else if (which === "weapon") {
-                    const arme = await Arme.findByPk(id, {transaction: t});
+                    const arme = await Arme.findByPk(value, {transaction: t});
                     if (!arme) {
                         return {
                             error: "Arme not found",
@@ -165,7 +186,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         await personnage.removeArme(arme, {transaction: t});
                     }
                 } else if (which === "equipment") {
-                    const equipement = await Equipement.findByPk(id, {transaction: t});
+                    const equipement = await Equipement.findByPk(value, {transaction: t});
                     if (!equipement) {
                         return {
                             error: "Equipement not found",
@@ -178,12 +199,13 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         await personnage.removeEquipement(equipement, {transaction: t});
                     }
                 } else {
-                    console.log(event)
                     return {
                         error: "Which not found",
                         code: 400,
                     };
                 }
+                personnageHistory.events = personnageHistory.events.concat(events);
+                await personnageHistory.save({transaction: t});
             }
             return personnage;
         });
