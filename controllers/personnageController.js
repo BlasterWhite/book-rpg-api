@@ -134,6 +134,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
         const result = await sequelize.transaction(async (t) => {
             const {id} = req.params;
             const {events} = req.body;
+
             const personnage = await Personnage.findByPk(id, {transaction: t});
             if (!personnage) {
                 return {
@@ -158,10 +159,12 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                 const {which, id, type, operation, value} = event;
 
                 let isEventAlreadyExists = false;
-                for (const personnageHistoryEvent of personnageHistoryEvents) {
-                    if (id === personnageHistoryEvent.id) {
-                        isEventAlreadyExists = true;
-                        break;
+                if (personnageHistory.events) {
+                    for (const personnageHistoryEvent of personnageHistoryEvents) {
+                        if (id === personnageHistoryEvent.id) {
+                            isEventAlreadyExists = true;
+                            break;
+                        }
                     }
                 }
                 if (isEventAlreadyExists) continue; // on ne traite pas les événements déjà traités
@@ -204,7 +207,10 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         code: 400,
                     };
                 }
-                personnageHistory.events = personnageHistory.events.concat(events);
+                // on récupère l'évent en base
+                const eventInBase = await Event.findByPk(id, {transaction: t});
+                // on fait
+                // personnageHistory.events = personnageHistory.events.concat(events); // on ajoute les événements traités
                 await personnageHistory.save({transaction: t});
             }
             return personnage;

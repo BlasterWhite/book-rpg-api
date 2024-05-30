@@ -135,7 +135,7 @@ Equipement.belongsToMany(Personnage, {
     foreignKey: "id_equipement",
 });
 
-Personnage.belongsTo(PersonnageHistory, {
+Personnage.hasOne(PersonnageHistory, {
     foreignKey: "id_personnage",
     as: "history",
 });
