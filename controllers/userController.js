@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/userModels");
 const Aventure = require("../models/aventureModels");
 const {Personnage} = require("../models/personnageModels");
+const Section = require("../models/sectionModels");
 
 exports.loginUser = async (req, res) => {
     try {
@@ -217,6 +218,10 @@ exports.getAllAventures = async (req, res) => {
                     model: Personnage,
                     as: "personnage",
                 },
+                {
+                    model: Section,
+                    as: "section",
+                }
             ],
         });
         await transaction.commit();
