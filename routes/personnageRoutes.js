@@ -8,9 +8,7 @@ router.get("/:id", personnageController.getOnePersonnage);
 router.get("/:id/aventure", personnageController.getAventureByPersonnage);
 router.post("/", personnageController.createPersonnage);
 router.put("/:id", personnageController.updatePersonnage);
-router.put("/:id/equipement", personnageController.updateEquipement);
-router.put("/:id/armes", personnageController.updateArmes);
-router.put("/:id/attributes", personnageController.updateAttributes);
+router.put("/:id/events", personnageController.updatePersonnageFromEvents);
 router.delete("/:id", personnageController.deletePersonnage);
 
 module.exports = router;
