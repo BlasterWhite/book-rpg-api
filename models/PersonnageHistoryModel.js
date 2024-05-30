@@ -1,8 +1,8 @@
 const {DataTypes} = require("sequelize");
 const sequelize = require("../db/db");
-const {Personnage} = require("./personnageModels");
-const Section = require("./sectionModels");
+
 const Event = require("./eventModels");
+const {Personnage} = require("./personnageModels");
 
 const PersonnageHistory = sequelize.define(
     "personnage_history",
@@ -26,10 +26,6 @@ const PersonnageHistory = sequelize.define(
         sections: {
             type: DataTypes.ARRAY(DataTypes.INTEGER),
             allowNull: true,
-            references: {
-                model: Section,
-                key: "id",
-            }
         },
     },
     {
