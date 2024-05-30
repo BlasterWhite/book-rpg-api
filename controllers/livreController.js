@@ -162,39 +162,43 @@ exports.getLivreById = async (req, res) => {
 };
 
 exports.updateLivre = async (req, res) => {
-    let transaction;
     try {
-        const {id, titre, resume, id_image, tag, date_sortie} = req.body;
-        transaction = await sequelize.transaction();
-        const livreExist = await Livre.findByPk(id, {transaction});
-        if (!livreExist) {
-            res.status(404).json({message: "Book not found"});
-            return;
-        }
-        await Livre.update(
-            {titre, resume, tag, date_sortie},
-            {
-                where: {
-                    id,
-                },
-            },
-            transaction
-        );
-        if (id_image) {
+        const result = await sequelize.transaction(async (t) => {
+            const {id, titre, resume, id_image, tag, date_sortie} = req.body;
+            const livreExist = await Livre.findByPk(id, {transaction: t});
+            if (!livreExist) {
+                return {
+                    code: 404,
+                    error: "Book not found",
+                }
+            }
             await Livre.update(
-                {id_image: id_image},
+                {titre, resume, tag, date_sortie},
                 {
                     where: {
                         id,
                     },
                 },
-                transaction
+                {transaction: t}
             );
+            if (id_image) {
+                await Livre.update(
+                    {id_image: id_image},
+                    {
+                        where: {
+                            id,
+                        },
+                    },
+                    {transaction: t}
+                );
+            }
+            return {message: "Book updated"};
+        });
+        if (result.error) {
+            return res.status(result.code).json({error: result.error});
         }
-        await transaction.commit();
-        res.status(200).json({message: "Book updated"});
+        res.status(200).json(result);
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
@@ -251,7 +255,8 @@ exports.getAllPopularLivres = async (req, res) => {
              FROM bookrpg.livre l
                       JOIN bookrpg.aventure a ON l.id = a.id_livre
              GROUP BY l.id
-             ORDER BY COUNT(DISTINCT a.id_utilisateur) DESC LIMIT 10;`,
+             ORDER BY COUNT(DISTINCT a.id_utilisateur) DESC
+             LIMIT 10;`,
             {type: sequelize.QueryTypes.SELECT, transaction},
         );
 
