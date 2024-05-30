@@ -56,7 +56,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-exports.createUser = async (req, res) => {
+exports.registerUser = async (req, res) => {
   let transaction;
   try {
     transaction = await sequelize.transaction();

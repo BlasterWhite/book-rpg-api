@@ -41,7 +41,7 @@ app.use((req, res, next) => {
                     req.path.includes("news") ||
                     req.path.includes("images")) &&
                 req.method === "GET") ||
-            (req.path.includes("/login") && req.method === "POST")) {
+            ((req.path.includes("/login") || req.path === "/users") && req.method === "POST")) {
             req.byPass = true;
             next();
         } else {
