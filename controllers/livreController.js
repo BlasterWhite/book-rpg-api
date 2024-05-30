@@ -172,26 +172,17 @@ exports.updateLivre = async (req, res) => {
                     error: "Book not found",
                 }
             }
-            await Livre.update(
-                {titre, resume, tag, date_sortie},
-                {
-                    where: {
-                        id,
-                    },
-                },
-                {transaction: t}
-            );
+            await livreExist.update({
+                titre,
+                resume,
+                tag,
+                date_sortie,
+            }, {transaction: t})
+
             if (id_image) {
-                await Livre.update(
-                    {id_image: id_image},
-                    {
-                        where: {
-                            id,
-                        },
-                    },
-                    {transaction: t}
-                );
+                await livreExist.update({id_image: id_image}, {transaction: t})
             }
+            await livreExist.save({transaction: t});
             return {message: "Book updated"};
         });
         if (result.error) {
