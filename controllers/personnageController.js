@@ -142,13 +142,14 @@ exports.updatePersonnageFromEvents = async (req, res) => {
 
             for (const event of events) {
                 const {which, id, type, operation, value} = event;
-                if (which === "attribut") {
+                console.log(which)
+                if (which === "attribute") {
                     if (operation === "add") {
                         await personnage.increment(type, {by: value, transaction: t});
                     } else if (operation === "remove") {
                         await personnage.decrement(type, {by: value, transaction: t});
                     }
-                } else if (which === "arme") {
+                } else if (which === "weapon") {
                     const arme = await Arme.findByPk(id, {transaction: t});
                     if (!arme) {
                         return {
@@ -161,7 +162,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                     } else if (operation === "remove") {
                         await personnage.removeArme(arme, {transaction: t});
                     }
-                } else if (which === "equipement") {
+                } else if (which === "equipment") {
                     const equipement = await Equipement.findByPk(id, {transaction: t});
                     if (!equipement) {
                         return {
@@ -175,6 +176,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         await personnage.removeEquipement(equipement, {transaction: t});
                     }
                 } else {
+                    console.log(event)
                     return {
                         error: "Which not found",
                         code: 400,
