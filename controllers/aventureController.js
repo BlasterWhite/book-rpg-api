@@ -113,93 +113,66 @@ exports.createAventure = async (req, res) => {
 };
 
 exports.getAllAventure = async (req, res) => {
-    let transaction;
     try {
-        transaction = await sequelize.transaction();
-        const aventure = await Aventure.findAll({transaction});
-        await transaction.commit();
+        const aventure = await Aventure.findAll();
         res.status(200).json(aventure);
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
 
 exports.getOneAventure = async (req, res) => {
-    let transaction;
     try {
         const {id} = req.params;
-        transaction = await sequelize.transaction();
-        const aventure = await Aventure.findByPk(id, {transaction});
-        await transaction.commit();
+        const aventure = await Aventure.findByPk(id);
         res.status(200).json(aventure);
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
 
 exports.updateAventure = async (req, res) => {
-    let transaction;
     try {
         const {id} = req.params;
         const {
             id_section_actuelle,
             statut,
         } = req.body;
-        transaction = await sequelize.transaction();
+        const aventure = await sequelize.transaction(async (t) => {
+            const aventure = await Aventure.findByPk(id, {transaction: t});
+            if (!aventure) {
+                return {error: "Aventure not found", code: 404};
+            }
+            await aventure.update({id_section_actuelle, statut}, {transaction: t});
+            return aventure;
+        });
 
-        await Aventure.update(
-            {id_section_actuelle, statut},
-            {
-                where: {
-                    id,
-                },
-                transaction
-            },
-        );
-        await transaction.commit();
-        res.status(200).json({message: "Aventure updated"});
+        if (aventure.error) {
+            return res.status(aventure.code).json({error: aventure.error});
+        }
+        res.status(200).json(aventure);
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
 
 exports.deleteAventure = async (req, res) => {
-    let transaction;
     try {
         const {id} = req.params;
-        transaction = await sequelize.transaction();
-        await Aventure.destroy({
-            where: {
-                id,
-            },
-            transaction
+        const aventure = await sequelize.transaction(async (t) => {
+            const aventure = await Aventure.findByPk(id, {transaction: t});
+            if (!aventure) {
+                return {error: "Aventure not found", code: 404};
+            }
+            await aventure.destroy({transaction: t});
+            return aventure;
         });
-        await transaction.commit();
+
+        if (aventure.error) {
+            return res.status(aventure.code).json({error: aventure.error});
+        }
         res.status(200).json({message: "Aventure deleted"});
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
-
-exports.getAllMostAventure = async (req, res) => {
-    let transaction;
-    try {
-        transaction = await sequelize.transaction();
-        const aventures = await Aventure.findAll({
-            attributes: ["id_livre", [sequelize.fn("COUNT", sequelize.literal("DISTINCT id_utilisateur")), "id_utilisateur"]],
-            group: ["id_livre"],
-            order: [[sequelize.fn("COUNT", sequelize.literal("DISTINCT id_utilisateur")), "DESC"]],
-            limit: 10,
-            transaction
-        });
-        await transaction.commit();
-        res.status(200).json(aventures);
-    } catch (error) {
-        if (transaction) await transaction.rollback();
-        res.status(500).json({error: error.message});
-    }
-}

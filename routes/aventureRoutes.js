@@ -4,7 +4,6 @@ const aventureController = require("../controllers/aventureController");
 const router = express.Router();
 
 router.get("/", aventureController.getAllAventure);
-router.get("/mostAventure", aventureController.getAllMostAventure);
 router.get("/:id", aventureController.getOneAventure);
 router.post("/", aventureController.createAventure);
 router.put("/:id", aventureController.updateAventure);
