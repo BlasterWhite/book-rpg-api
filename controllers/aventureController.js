@@ -7,6 +7,7 @@ const Image = require("../models/imageModels");
 const Arme = require("../models/armeModels");
 const {Personnage} = require("../models/personnageModels");
 const PersonnageHistory = require("../models/PersonnageHistoryModel");
+const {Sequelize} = require("sequelize");
 
 exports.createAventure = async (req, res) => {
     try {
@@ -146,9 +147,14 @@ exports.updateAventure = async (req, res) => {
             }
 
             await aventure.update({id_section_actuelle, statut}, {transaction: t});
-            await PersonnageHistory.findByPk(aventure.id_personnage, {transaction: t}).then((personnageHistory) => {
-                console.log(personnageHistory);
-            });
+            await PersonnageHistory.update({
+                    sections: Sequelize.fn('array_append', Sequelize.col('sections'), id_section_actuelle),
+                }, {
+                    where: {
+                        id_personnage: aventure.id_personnage,
+                    },
+                    transaction: t,
+                });
             return aventure;
         });
 

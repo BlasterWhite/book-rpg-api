@@ -156,7 +156,6 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                 transaction: t,
             });
 
-            // on récupère la colonne events du personnage history
             const personnageHistoryEvents = personnageHistory[0].dataValues.events;
 
             for (const event of events) {
@@ -210,11 +209,6 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         error: "Which not found",
                         code: 400,
                     };
-                }
-                if (personnageHistory.events == null) {
-                    personnageHistory.events = [id]
-                } else {
-                    personnageHistory.events.push(id);
                 }
 
                 await PersonnageHistory.update({
@@ -279,11 +273,17 @@ exports.deletePersonnage = async (req, res) => {
 exports.getAventureByPersonnage = async (req, res) => {
     try {
         const {id} = req.params;
-        const aventure = await Aventure.findOne({
-            where: {
-                id_personnage: id,
-            },
+        const aventure = await sequelize.transaction(async (t) => {
+            return await Aventure.findOne({
+                where: {
+                    id_personnage: id,
+                },
+                transaction: t,
+            });
         });
+        if (!aventure) {
+            return res.status(404).json({error: "Aventure not found"});
+        }
         res.status(200).json(aventure);
     } catch (error) {
         res.status(500).json({error: error.message});

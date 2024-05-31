@@ -388,7 +388,6 @@ exports.updateSection = async (req, res) => {
                 updatedSection.addSections(search, {transaction});
             }
         }
-        let queryRes;
         if (type === "none") {
             res.status(400).json({error: "Type none is not allowed for update"});
             return;
