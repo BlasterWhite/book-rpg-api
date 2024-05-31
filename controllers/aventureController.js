@@ -6,6 +6,7 @@ const Section = require("../models/sectionModels");
 const Image = require("../models/imageModels");
 const Arme = require("../models/armeModels");
 const {Personnage} = require("../models/personnageModels");
+const PersonnageHistory = require("../models/PersonnageHistoryModel");
 
 exports.createAventure = async (req, res) => {
     try {
@@ -143,7 +144,11 @@ exports.updateAventure = async (req, res) => {
             if (!aventure) {
                 return {error: "Aventure not found", code: 404};
             }
+
             await aventure.update({id_section_actuelle, statut}, {transaction: t});
+            await PersonnageHistory.findByPk(aventure.id_personnage, {transaction: t}).then((personnageHistory) => {
+                console.log(personnageHistory);
+            });
             return aventure;
         });
 
@@ -164,6 +169,8 @@ exports.deleteAventure = async (req, res) => {
             if (!aventure) {
                 return {error: "Aventure not found", code: 404};
             }
+            await Personnage.destroy({where: {id: aventure.id_personnage}, transaction: t});
+            await PersonnageHistory.destroy({where: {id_personnage: aventure.id_personnage}, transaction: t});
             await aventure.destroy({transaction: t});
             return aventure;
         });
