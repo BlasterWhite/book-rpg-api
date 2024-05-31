@@ -44,11 +44,6 @@ const Aventure = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        updated_at: {
-            type: 'TIMESTAMP',
-            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
-            allowNull: true,
-        }
     },
     {
         schema: "bookrpg",
@@ -58,6 +53,9 @@ const Aventure = sequelize.define(
                 exclude: [],
             },
         },
+        timestamps: true,
+        updatedAt: "updated_at",
+        createdAt: false
     },
 );
 

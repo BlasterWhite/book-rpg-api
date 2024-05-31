@@ -4,7 +4,7 @@ const PersonnageHistory = require("../models/PersonnageHistoryModel");
 
 exports.createPersonnageHistory = async (req, res) => {
     try {
-        const { id_personnage, events, sections } = req.body;
+        const {id_personnage, events, sections} = req.body;
         await PersonnageHistory.create({
             id_personnage,
             events,
@@ -12,14 +12,14 @@ exports.createPersonnageHistory = async (req, res) => {
         });
         res.status(201).json("Personnage history created");
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 }
 
 
 exports.getPersonnageHistory = async (req, res) => {
     try {
-        const { id } = req.params;
+        const {id} = req.params;
         const personnageHistory = await PersonnageHistory.findOne({
             where: {
                 id_personnage: id,
@@ -27,32 +27,42 @@ exports.getPersonnageHistory = async (req, res) => {
         });
         res.status(200).json(personnageHistory);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 }
 
 exports.updatePersonnageHistory = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { events, sections } = req.body;
+        const {id} = req.params;
+        const {events, sections} = req.body;
         const result = await sequelize.transaction(async (t) => {
             const personnageHistory = await PersonnageHistory.findOne({
                 where: {
                     id_personnage: id,
                 },
+                transaction: t,
             });
-            if (events) {
-                personnageHistory.events = personnageHistory.events.concat(events);
-            }
+            if (events) personnageHistory.dataValues.events.push(...events)
+            if (sections) personnageHistory.dataValues.sections.push(...sections);
 
-            if (sections) {
-                personnageHistory.sections = personnageHistory.sections.concat(sections);
-            }
-            await personnageHistory.save({ transaction: t });
-            return personnageHistory;
+            await PersonnageHistory.update({
+                events: personnageHistory.dataValues.events,
+                sections: personnageHistory.dataValues.sections,
+            }, {
+                where: {
+                    id_personnage: id,
+                },
+                transaction: t,
+            });
+            return await PersonnageHistory.findOne({
+                where: {
+                    id_personnage: id,
+                },
+                transaction: t,
+            });
         });
         res.status(204).json(result);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 }

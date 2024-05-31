@@ -9,15 +9,16 @@ const {Personnage} = require("../models/personnageModels");
 
 exports.createAventure = async (req, res) => {
     try {
-        const {id_livre} = req.body;
+        const {id_utilisateur, id_livre} = req.body;
         const result = await sequelize.transaction(async (t) => {
-            if (!id_utilisateur) {
+            if (id_utilisateur == null) {
                 return {
                     error: "id_utilisateur is required",
                     code: 400,
                 };
             }
-            if (!id_livre) {
+
+            if (id_livre == null) {
                 return {
                     error: "id_livre is required",
                     code: 400,
@@ -80,7 +81,7 @@ exports.createAventure = async (req, res) => {
                     transaction: t
                 },
             );
-            const armeParDefault = await Arme.findOrCreate({
+            const [armeParDefault, created] = await Arme.findOrCreate({
                 where: {
                     titre: "Poing",
                 },
@@ -93,10 +94,10 @@ exports.createAventure = async (req, res) => {
                 },
                 transaction: t
             });
-            await personnageCreated.addArme(armeParDefault, {transaction});
+            await personnageCreated.addArme(armeParDefault, {transaction: t});
             return await Aventure.create({
-                id_utilisateur,
-                id_livre,
+                id_utilisateur: id_utilisateur,
+                id_livre: id_livre,
                 id_section_actuelle: section.id,
                 id_personnage: personnageCreated.id,
                 statut: "en cours",
@@ -107,7 +108,6 @@ exports.createAventure = async (req, res) => {
         }
         res.status(201).json(result);
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message, stack: error.stack});
     }
 };

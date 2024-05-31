@@ -9,6 +9,7 @@ const Aventure = require("../models/aventureModels");
 const sequelize = require("../db/db");
 const Equipement = require("../models/equipementModels");
 const PersonnageHistory = require("../models/PersonnageHistoryModel");
+const {Sequelize} = require("sequelize");
 
 
 exports.createPersonnage = async (req, res) => {
@@ -143,25 +144,28 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                 };
             }
 
+            const id_personnage = id;
+
             const personnageHistory = await PersonnageHistory.findOrCreate({
                 where: {
-                    id_personnage: id,
+                    id_personnage,
                 },
                 defaults: {
-                    id_personnage: id,
+                    id_personnage,
                 },
                 transaction: t,
             });
 
-            const personnageHistoryEvents = personnageHistory.events;
+            // on récupère la colonne events du personnage history
+            const personnageHistoryEvents = personnageHistory[0].dataValues.events;
 
             for (const event of events) {
                 const {which, id, type, operation, value} = event;
 
                 let isEventAlreadyExists = false;
-                if (personnageHistory.events) {
+                if (personnageHistoryEvents) {
                     for (const personnageHistoryEvent of personnageHistoryEvents) {
-                        if (id === personnageHistoryEvent.id) {
+                        if (id === personnageHistoryEvent) {
                             isEventAlreadyExists = true;
                             break;
                         }
@@ -207,11 +211,20 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         code: 400,
                     };
                 }
-                // on récupère l'évent en base
-                const eventInBase = await Event.findByPk(id, {transaction: t});
-                // on fait
-                // personnageHistory.events = personnageHistory.events.concat(events); // on ajoute les événements traités
-                await personnageHistory.save({transaction: t});
+                if (personnageHistory.events == null) {
+                    personnageHistory.events = [id]
+                } else {
+                    personnageHistory.events.push(id);
+                }
+
+                await PersonnageHistory.update({
+                    events: Sequelize.fn('array_append', Sequelize.col('events'), id),
+                }, {
+                    where: {
+                        id_personnage,
+                    },
+                    transaction: t,
+                });
             }
             return personnage;
         });
@@ -222,7 +235,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
     } catch (error) {
         res.status(500).json({error: error.message});
     }
-};
+}
 
 exports.deletePersonnage = async (req, res) => {
     try {

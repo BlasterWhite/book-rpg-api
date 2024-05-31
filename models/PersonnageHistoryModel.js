@@ -36,6 +36,9 @@ const PersonnageHistory = sequelize.define(
                 exclude: [],
             },
         },
+        timestamps: true,
+        updatedAt: "updated_at",
+        createdAt: false
     },
 );
 
