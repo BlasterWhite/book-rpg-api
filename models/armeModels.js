@@ -44,7 +44,10 @@ const Arme = sequelize.define(
 Arme.hasOne(Image, {
   foreignKey: "id",
   sourceKey: "id_image",
-  as: "image",
+});
+Image.belongsTo(Arme, {
+  foreignKey: "id",
+  targetKey: "id_image",
 });
 
 Arme.getAttributes = () => {
