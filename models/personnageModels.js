@@ -159,6 +159,14 @@ Personnage.getAttributes = () => {
     ];
 };
 
+Personnage.ALL_ATTRIBUTS = [
+    "force",
+    "dexterite",
+    "endurance",
+    "psychisme",
+    "resistance",
+];
+
 module.exports = {
     Personnage,
     AssociationArmePersonnage,
