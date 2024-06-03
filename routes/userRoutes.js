@@ -12,9 +12,7 @@ router.get("/aventures/:idAventure", userController.getAventureById);
 router.get("/aventures/livres/:idLivre", userController.getAventureByIdLivre);
 
 router.get("/favoris", favorisController.getAllFavoris);
-router.get("/favoris/:idLivre", favorisController.getFavorisByLivre);
 router.post("/favoris", favorisController.createFavoris);
-router.put("/favoris/:id", favorisController.updateFavoris);
 router.delete("/favoris/:idLivre", favorisController.deleteFavoris);
 
 router.get("/", userController.getAllUsers);
