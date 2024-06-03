@@ -74,12 +74,15 @@ Aventure.belongsTo(Personnage, {
 
 Aventure.hasOne(Section, {
     foreignKey: "id",
+    sourceKey: "id_section_actuelle",
 });
 Aventure.hasOne(Personnage, {
     foreignKey: "id",
+    sourceKey: "id_personnage",
 });
 Aventure.hasOne(User, {
     foreignKey: "id",
+    sourceKey: "id_utilisateur",
 });
 
 Aventure.getAttributes = () => {

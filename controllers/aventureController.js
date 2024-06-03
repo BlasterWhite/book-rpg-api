@@ -131,11 +131,13 @@ exports.getOneAventure = async (req, res) => {
                 {
                     model: Personnage,
                     as: "personnage",
+                    separate: true,
                     attributes: Personnage.getAttributes(),
                 },
                 {
                     model: Section,
                     as: "section",
+                    separate: true,
                     attributes: Section.getAttributes(),
                 },
             ],
