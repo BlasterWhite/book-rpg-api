@@ -4,129 +4,124 @@ const Image = require("../models/imageModels");
 const Equipement = require("../models/equipementModels");
 
 exports.getAllEquipement = async (req, res) => {
-  let transaction;
-  try {
-    transaction = await sequelize.transaction();
-    const equipement = await Equipement.findAll({
-      include: [
-        {
-          model: Image,
-          as: "image",
-          attributes: ["image"],
-        },
-      ],
-      transaction,
-    });
-    await transaction.commit();
-    res.status(200).json(equipement);
-  } catch (error) {
-    if (transaction) await transaction.rollback();
-    res.status(500).json({ error: error.message });
-  }
+    try {
+        const equipement = await Equipement.findAll({
+            include: [
+                {
+                    model: Image,
+                    as: "image",
+                    attributes: ["image"],
+                },
+            ],
+        });
+        res.status(200).json(equipement);
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
 };
 
 exports.getOneEquipement = async (req, res) => {
-  let transaction;
-  try {
-    transaction = await sequelize.transaction();
-    const { id } = req.params;
-    const equipement = await Equipement.findOne({
-      where: {
-        id,
-      },
-      include: [
-        {
-          model: Image,
-          as: "image",
-          attributes: ["image"],
-        },
-      ],
-      transaction,
-    });
-    await transaction.commit();
-    res.status(200).json(equipement);
-  } catch (error) {
-    if (transaction) await transaction.rollback();
-    res.status(500).json({ error: error.message });
-  }
+    try {
+        const {id} = req.params;
+        const equipement = await Equipement.findOne({
+            where: {
+                id,
+            },
+            include: [
+                {
+                    model: Image,
+                    as: "image",
+                    attributes: ["image"],
+                },
+            ],
+        });
+        res.status(200).json(equipement);
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
 };
 
 exports.createEquipement = async (req, res) => {
-  let transaction;
-  try {
-    transaction = await sequelize.transaction();
-    const { nom, description, id_image, resistance } = req.body;
-    let image;
-    if (id_image) {
-      image = await Image.findByPk(id_image, {
-        transaction,
-      });
+    try {
+        const {nom, description, id_image, resistance} = req.body;
+        await sequelize.transaction(async (t) => {
+            const [image, created] = await Image.findOrCreate({
+                where: {
+                    id: id_image,
+                },
+                defaults: {
+                    image: "https://picsum.photos/270/500",
+                },
+                transaction: t,
+            });
+
+            return await Equipement.create({
+                nom,
+                description,
+                id_image: image.id,
+                resistance,
+            }, {transaction: t});
+        });
+        res.status(201).json({message: "Equipement created"});
+    } catch (error) {
+        res.status(500).json({error: error.message});
     }
-    if (!image) {
-      image = await Image.create({
-        image: "https://picsum.photos/270/500",
-      }, {transaction});
-    }
-    const equipement = await Equipement.create(
-      {
-        nom,
-        description,
-        id_image: image.id,
-        resistance,
-      },
-      { transaction },
-    );
-    await transaction.commit();
-    res.status(201).json(equipement);
-  } catch (error) {
-    if (transaction) await transaction.rollback();
-    res.status(500).json({ error: error.message });
-  }
 };
 
 exports.updateEquipement = async (req, res) => {
-  let transaction;
-  try {
-    transaction = await sequelize.transaction();
-    const { id } = req.params;
-    const { nom, description, id_image, resistance } = req.body;
-    await Equipement.update(
-      {
-        nom,
-        description,
-        id_image,
-        resistance,
-      },
-      {
-        where: {
-          id,
-        },
-        transaction,
-      },
-    );
-    await transaction.commit();
-    res.status(200).json({ message: "Equipement updated" });
-  } catch (error) {
-    if (transaction) await transaction.rollback();
-    res.status(500).json({ error: error.message });
-  }
+    try {
+        const {id} = req.params;
+        const {nom, description, id_image, resistance} = req.body;
+        const result = await sequelize.transaction(async (t) => {
+            const equipement = await Equipement.findByPk(id, {transaction: t});
+            if (!equipement) {
+                return {
+                    code: 404,
+                    message: "Equipement not found",
+                }
+            }
+            if (nom) equipement.nom = nom;
+            if (description) equipement.description = description;
+            if (resistance) equipement.resistance = resistance;
+            if (id_image) {
+                const image = await Image.findByPk(id_image, {transaction: t});
+                if (!image) {
+                    return {
+                        code: 404,
+                        message: "Image not found",
+                    }
+                }
+                equipement.id_image = image.id;
+            }
+            return await equipement.save({transaction: t});
+        });
+        if (result.error) {
+            return res.status(result.code).json({error: result.message});
+        }
+        res.status(200).json({message: "Equipement updated"});
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
 };
 
 exports.deleteEquipement = async (req, res) => {
-  let transaction;
-  try {
-    transaction = await sequelize.transaction();
-    const { id } = req.params;
-    await Equipement.destroy({
-      where: {
-        id,
-      },
-      transaction,
-    });
-    await transaction.commit();
-    res.status(200).json({ message: "Equipement deleted" });
-  } catch (error) {
-    if (transaction) await transaction.rollback();
-    res.status(500).json({ error: error.message });
-  }
+    try {
+        const {id} = req.params;
+        const result = await sequelize.transaction(async (t) => {
+            const equipement = await Equipement.findByPk(id, {transaction: t});
+            if (!equipement) {
+                return {
+                    code: 404,
+                    message: "Equipement not found",
+                }
+            }
+            return await equipement.destroy({transaction: t});
+        });
+        if (result.error) {
+            return res.status(result.code).json({error: result.message});
+        }
+        res.status(200).json({message: "Equipement deleted"});
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
 };
