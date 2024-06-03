@@ -334,7 +334,7 @@ exports.updateSection = async (req, res) => {
 
             if (!updatedSection) return {
                 code: 404,
-                message: "Section not found",
+                error: "Section not found",
             }
 
             if (Array.isArray(destinations) && destinations.length > 0) {
@@ -350,7 +350,7 @@ exports.updateSection = async (req, res) => {
                     });
                     if (!search) return {
                         code: 404,
-                        message: "Destination not found",
+                        error: "Destination not found",
                     }
                     updatedSection.addSections(search, {transaction: t});
                 }
@@ -358,20 +358,20 @@ exports.updateSection = async (req, res) => {
 
             if (type === "none") return {
                 code: 400,
-                message: "Type none is not allowed for update",
+                error: "Type none is not allowed for update",
             }
 
             if (["des", "combat", "enigme"].includes(type)) {
                 if (typeof resultat === "undefined") return {
                     code: 400,
-                    message: `Type ${type} must have a resultat`,
+                    error: `Type ${type} must have a resultat`,
                 }
 
                 const winType = (typeof resultat.gagne !== "number");
                 const looseType = (typeof resultat.perd !== "number");
                 if (winType || looseType) return {
                     code: 400,
-                    message: "Type gagne and perd must be integer",
+                    error: "Type gagne and perd must be integer",
                 }
             }
 
@@ -379,13 +379,13 @@ exports.updateSection = async (req, res) => {
                 case "des":
                     if (resultat.type_condition !== "JSON") return {
                         code: 400,
-                        message: "Type condition must be JSON",
+                        error: "Type condition must be JSON",
                     }
 
                     for (const key in resultat.condition) {
                         if (!Array.isArray(resultat.condition[key])) return {
                             code: 400,
-                            message: "Type condition must be a list of integer",
+                            error: "Type condition must be a list of integer",
                         }
                     }
 
@@ -403,7 +403,7 @@ exports.updateSection = async (req, res) => {
                 case "enigme":
                     if (resultat.type_condition !== "text") return {
                         code: 400,
-                        message: "Type condition must be text",
+                        error: "Type condition must be text",
                     }
 
                     if (updatedSection.resultat) await updatedSection.resultat.destroy({transaction: t});
@@ -420,13 +420,13 @@ exports.updateSection = async (req, res) => {
                 case "combat":
                     if (typeof resultat.type_condition !== "number") return {
                         code: 400,
-                        message: "Type condition must be integer",
+                        error: "Type condition must be integer",
                     }
 
                     resultat.condition = resultat.condition.toLowerCase();
                     if (!Personnage.ALL_ATTRIBUTS.includes(resultat.condition)) return {
                         code: 400,
-                        message: "Type condition must be in personnage attributs",
+                        error: "Type condition must be in personnage attributs",
                     }
 
                     if (updatedSection.resultat) await updatedSection.resultat.destroy({transaction: t});
@@ -476,7 +476,7 @@ exports.updateSection = async (req, res) => {
                 const image = await Image.findByPk(id_image, {transaction: t});
                 if (!image) return {
                     code: 404,
-                    message: "Image not found",
+                    error: "Image not found",
                 }
                 updatedSection.id_image = image.id;
             }
