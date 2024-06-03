@@ -285,7 +285,6 @@ exports.getSectionById = async (req, res) => {
                 {
                     model: Event,
                     as: "events",
-                    separate: true
                 },
             ],
         });
@@ -324,12 +323,10 @@ exports.updateSection = async (req, res) => {
                     {
                         model: Resultat,
                         as: "resultat",
-                        separate: true,
                     },
                     {
                         model: Section,
                         as: "sections",
-                        separate: true,
                     }
                 ],
                 transaction: t,
