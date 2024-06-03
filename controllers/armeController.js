@@ -103,7 +103,6 @@ exports.updateArme = async (req, res) => {
                 },
                 {
                     transaction: t,
-                    separate: true
                 },
             );
         });
@@ -127,7 +126,7 @@ exports.deleteArme = async (req, res) => {
                     message: "Arme not found",
                 }
             }
-            return await arme.destroy({transaction: t, separate: true});
+            return await arme.destroy({transaction: t});
         });
         if (result.error) {
             return res.status(result.code).json({error: result.message});

@@ -105,115 +105,108 @@ exports.registerUser = async (req, res) => {
 };
 
 exports.getAllUsers = async (req, res) => {
-    let transaction;
     try {
-        transaction = await sequelize.transaction();
         if (req.user.permission !== "admin") {
             return res.status(403).json({message: "You don't have the rights for this action"});
         }
         const users = await User.findAll({
             attributes: ["mail", "nom", "prenom", "permission", "creation_date"],
-            transaction,
         });
-        await transaction.commit();
         res.status(200).json(users);
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
 
 exports.getUserById = async (req, res) => {
-    let transaction;
     try {
-        transaction = await sequelize.transaction();
         const {id} = req.params
         if (String(id) !== String(req.user.id) && req.user.permission !== "admin") {
             return res.status(403).json({message: "You don't have the rights for this action"});
         }
         const user = await User.findByPk(id, {
-            attributes: ["mail", "nom", "prenom", "creation_date"],
-            transaction,
-        }); // SELECT * FROM User WHERE id = id;
-        await transaction.commit();
+            attributes: ["mail", "nom", "prenom", "permission", "creation_date"],
+        });
         res.status(200).json(user);
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
 
 exports.updateUser = async (req, res) => {
-    let transaction;
     try {
-        transaction = await sequelize.transaction();
         const {id} = req.params;
+
         if (String(id) !== String(req.user.id) && req.user.permission !== "admin") {
             return res.status(403).json({message: "You don't have the rights for this action"});
         }
+
         const {mail, nom, prenom, password} = req.body;
         const mot_de_passe_crypte = await bcrypt.hash(password, 10);
-        await User.update(
-            {mail, nom, prenom, mot_de_passe: mot_de_passe_crypte},
-            {
-                where: {
-                    id,
+        const result = await sequelize.transaction(async t => {
+            const user = await User.findByPk(id, {transaction: t});
+            if (!user) {
+                return {
+                    code: 404,
+                    message: "User not found",
+                }
+            }
+            return await user.update(
+                {mail, nom, prenom, mot_de_passe: mot_de_passe_crypte},
+                {
+                    transaction: t,
                 },
-                transaction,
-            },
-        );
-        await transaction.commit();
+            );
+        });
+        if (result.error) {
+            return res.status(result.code).json({error: result.message});
+        }
         res.status(200).json({message: "User updated"});
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
 
 exports.deleteUser = async (req, res) => {
-    let transaction;
     try {
-        transaction = await sequelize.transaction();
         const {id} = req.params;
-        if (String(id) !== String(req.user.id) && req.user.permission !== "admin") {
-            return res.status(403).json({message: "You don't have the rights for this action"});
-        }
-
-        await User.destroy({
-            where: {
-                id,
-            },
-            transaction,
+        const userFromToken = req.user;
+        const result = await sequelize.transaction(async t => {
+            if ((String(id) !== String(userFromToken.id)) && (userFromToken.permission !== "admin")) {
+                return {
+                    code: 403,
+                    message: "You don't have the rights for this action",
+                }
+            }
+            const user = await User.findByPk(id, {transaction: t});
+            if (!user) {
+                return {
+                    code: 404,
+                    message: "User not found",
+                }
+            }
+            return await user.destroy({transaction: t});
         });
-        await transaction.commit();
+        if (result.error) {
+            return res.status(result.code).json({error: result.message});
+        }
         res.status(200).json({message: "User deleted"});
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
 
 exports.getAllAventures = async (req, res) => {
-    let transaction;
     try {
-        transaction = await sequelize.transaction();
         const idUser = req.user.id;
-
         if (req.user.permission !== "admin") {
             return res.status(403).json({message: "You don't have the rights for this action"});
         }
-
         const aventures = await Aventure.findAll({
             where: {
                 id_utilisateur: idUser,
             },
-            transaction,
             include: [
-                {
-                    model: User,
-                    as: "utilisateur",
-                    attributes: ["mail", "nom", "prenom", "creation_date"],
-                },
                 {
                     model: Personnage,
                     as: "personnage",
@@ -224,18 +217,14 @@ exports.getAllAventures = async (req, res) => {
                 }
             ],
         });
-        await transaction.commit();
         res.status(200).json(aventures);
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
 
 exports.getAventureById = async (req, res) => {
-    let transaction;
     try {
-        transaction = await sequelize.transaction();
         const {idAventure} = req.params;
         const idUser = req.user.id;
         const aventure = await Aventure.findAll({
@@ -243,33 +232,48 @@ exports.getAventureById = async (req, res) => {
                 id: idAventure,
                 id_utilisateur: idUser,
             },
-            transaction,
+            include: [
+                {
+                    model: Personnage,
+                    as: "personnage",
+                },
+                {
+                    model: Section,
+                    as: "section",
+                }
+            ],
         });
-        await transaction.commit();
         res.status(200).json(aventure);
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
 
 exports.getAventureByIdLivre = async (req, res) => {
-    let transaction;
     try {
-        transaction = await sequelize.transaction();
         const {idLivre} = req.params;
         const idUser = req.user.id;
-        const aventure = await Aventure.findAll({
-            where: {
-                id_utilisateur: idUser,
-                id_livre: idLivre,
-            },
-            transaction,
+        const result = await sequelize.transaction(async t => {
+            return await Aventure.findAll({
+                where: {
+                    id_utilisateur: idUser,
+                    id_livre: idLivre,
+                },
+                include: [
+                    {
+                        model: Personnage,
+                        as: "personnage",
+                    },
+                    {
+                        model: Section,
+                        as: "section",
+                    }
+                ],
+                transaction: t,
+            });
         });
-        await transaction.commit();
-        res.status(200).json(aventure);
+        res.status(200).json(result);
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };
