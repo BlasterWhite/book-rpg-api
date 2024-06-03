@@ -485,7 +485,7 @@ exports.updateSection = async (req, res) => {
         });
 
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json(result.error);
         }
         res.status(200).json({message: "Section updated"});
     } catch (error) {
