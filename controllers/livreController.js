@@ -83,7 +83,7 @@ exports.createLivre = async (req, res) => {
                 {transaction: t});
         });
         if (result.error) {
-            return res.status(result.code).json(result.error);
+            return res.status(result.code).json({error: result.error});
         }
         res.status(201).json({message: "Book created"});
     } catch (error) {
@@ -118,7 +118,7 @@ exports.getLivreById = async (req, res) => {
                 },
             ],
         });
-        if (!livre) return res.status(404).json({message: "Book not found"});
+        if (!livre) return res.status(404).json({error: "Book not found"});
         res.status(200).json(livre);
     } catch (error) {
         res.status(500).json({error: error.message});
@@ -148,13 +148,12 @@ exports.updateLivre = async (req, res) => {
                 }
                 livreExist.id_image = id_image;
             }
-            await livreExist.save({transaction: t});
-            return {message: "Book updated"};
+            return await livreExist.save({transaction: t});
         });
         if (result.error) {
             return res.status(result.code).json({error: result.error});
         }
-        res.status(200).json(result);
+        res.status(200).json({message: "Book updated"});
     } catch (error) {
         res.status(500).json({error: error.message});
     }
@@ -172,7 +171,7 @@ exports.deleteLivre = async (req, res) => {
             return await livre.destroy({transaction: t});
         });
         if (result.error) {
-            return res.status(result.code).json(result.error);
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: "Book deleted"});
     } catch (error) {

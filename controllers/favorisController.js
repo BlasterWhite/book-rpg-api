@@ -57,16 +57,14 @@ exports.deleteFavoris = async (req, res) => {
                 },
                 transaction: t,
             });
-            if (!favoris) {
-                return {
-                    code: 404,
-                    message: "Favoris not found",
-                }
+            if (!favoris) return {
+                code: 404,
+                error: "Favoris not found",
             }
             return favoris;
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: `Favoris for book ${idLivre} deleted`});
     } catch (error) {

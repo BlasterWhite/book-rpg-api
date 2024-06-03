@@ -49,7 +49,7 @@ exports.createArme = async (req, res) => {
             if (!image) {
                 return {
                     code: 404,
-                    message: "Image not found",
+                    error: "Image not found",
                 }
             }
             return await Arme.create(
@@ -66,7 +66,7 @@ exports.createArme = async (req, res) => {
             );
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(201).json({message: "Arme created"});
     } catch (error) {
@@ -80,18 +80,14 @@ exports.updateArme = async (req, res) => {
         const {titre, description, id_image, degats, durabilite} = req.body;
         const result = await sequelize.transaction(async (t) => {
             const arme = await Arme.findByPk(id, {transaction: t});
-            if (!arme) {
-                return {
-                    code: 404,
-                    message: "Arme not found",
-                }
+            if (!arme) return {
+                code: 404,
+                error: "Arme not found",
             }
             const image = await Image.findByPk(id_image, {transaction: t});
-            if (!image) {
-                return {
-                    code: 404,
-                    message: "Image not found",
-                }
+            if (!image) return {
+                code: 404,
+                error: "Image not found",
             }
             return await arme.update(
                 {
@@ -107,7 +103,7 @@ exports.updateArme = async (req, res) => {
             );
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: "Arme updated"});
     } catch (error) {
@@ -120,16 +116,14 @@ exports.deleteArme = async (req, res) => {
         const {id} = req.params;
         const result = await sequelize.transaction(async (t) => {
             const arme = await Arme.findByPk(id, {transaction: t});
-            if (!arme) {
-                return {
-                    code: 404,
-                    message: "Arme not found",
-                }
+            if (!arme) return {
+                code: 404,
+                error: "Arme not found",
             }
             return await arme.destroy({transaction: t});
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: "Arme deleted"});
     } catch (error) {

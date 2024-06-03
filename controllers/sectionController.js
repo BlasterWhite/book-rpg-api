@@ -191,7 +191,7 @@ exports.createSection = async (req, res) => {
             });
         });
         if (result.error) {
-            return res.status(result.code).json(result.error);
+            return res.status(result.code).json({error: result.error});
         }
         res.status(201).json({message: "Section created", section: result});
     } catch (error) {
@@ -485,7 +485,7 @@ exports.updateSection = async (req, res) => {
         });
 
         if (result.error) {
-            return res.status(result.code).json(result.error);
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: "Section updated"});
     } catch (error) {
@@ -511,7 +511,7 @@ exports.deleteSection = async (req, res) => {
             return await section.destroy({transaction: t});
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: "Section deleted"});
     } catch (error) {
@@ -531,7 +531,7 @@ exports.createEvent = async (req, res) => {
 
             if (operationType || whichType || valueType) return {
                 code: 400,
-                message: "Missing arguments for event",
+                error: "Missing arguments for event",
             }
 
             const section = await Section.findOne({
@@ -544,7 +544,7 @@ exports.createEvent = async (req, res) => {
 
             if (!section) return {
                 code: 404,
-                message: "Section not found",
+                error: "Section not found",
             }
 
             return await Event.create(
@@ -559,7 +559,7 @@ exports.createEvent = async (req, res) => {
             );
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(201).json({message: "Event created"});
     } catch (error) {
@@ -583,7 +583,7 @@ exports.updateEvent = async (req, res) => {
 
             if (!updatedEvent) return {
                 code: 404,
-                message: "Event not found",
+                error: "Event not found",
             }
 
             if (operation) updatedEvent.operation = operation;
@@ -595,7 +595,7 @@ exports.updateEvent = async (req, res) => {
         });
 
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: "Event updated"});
     } catch (error) {
@@ -616,12 +616,12 @@ exports.deleteEvent = async (req, res) => {
             });
             if (!event) return {
                 code: 404,
-                message: "Event not found",
+                error: "Event not found",
             }
             return await event.destroy({transaction: t});
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: "Event deleted"});
     } catch (error) {

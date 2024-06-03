@@ -6,13 +6,9 @@ const Equipement = require("../models/equipementModels");
 exports.getAllEquipement = async (req, res) => {
     try {
         const equipement = await Equipement.findAll({
-            include: [
-                {
-                    model: Image,
-                    as: "image",
-                    attributes: ["image"],
-                },
-            ],
+            include: [{
+                model: Image, as: "image", attributes: ["image"],
+            },],
         });
         res.status(200).json(equipement);
     } catch (error) {
@@ -26,14 +22,9 @@ exports.getOneEquipement = async (req, res) => {
         const equipement = await Equipement.findOne({
             where: {
                 id,
-            },
-            include: [
-                {
-                    model: Image,
-                    as: "image",
-                    attributes: ["image"],
-                },
-            ],
+            }, include: [{
+                model: Image, as: "image", attributes: ["image"],
+            },],
         });
         res.status(200).json(equipement);
     } catch (error) {
@@ -48,18 +39,13 @@ exports.createEquipement = async (req, res) => {
             const [image, created] = await Image.findOrCreate({
                 where: {
                     id: id_image,
-                },
-                defaults: {
+                }, defaults: {
                     image: "https://picsum.photos/270/500",
-                },
-                transaction: t,
+                }, transaction: t,
             });
 
             return await Equipement.create({
-                nom,
-                description,
-                id_image: image.id,
-                resistance,
+                nom, description, id_image: image.id, resistance,
             }, {transaction: t});
         });
         res.status(201).json({message: "Equipement created"});
@@ -76,8 +62,7 @@ exports.updateEquipement = async (req, res) => {
             const equipement = await Equipement.findByPk(id, {transaction: t});
             if (!equipement) {
                 return {
-                    code: 404,
-                    message: "Equipement not found",
+                    code: 404, error: "Equipement not found",
                 }
             }
             if (nom) equipement.nom = nom;
@@ -85,18 +70,15 @@ exports.updateEquipement = async (req, res) => {
             if (resistance) equipement.resistance = resistance;
             if (id_image) {
                 const image = await Image.findByPk(id_image, {transaction: t});
-                if (!image) {
-                    return {
-                        code: 404,
-                        message: "Image not found",
-                    }
+                if (!image) return {
+                    code: 404, error: "Image not found",
                 }
                 equipement.id_image = image.id;
             }
             return await equipement.save({transaction: t});
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: "Equipement updated"});
     } catch (error) {
@@ -109,16 +91,13 @@ exports.deleteEquipement = async (req, res) => {
         const {id} = req.params;
         const result = await sequelize.transaction(async (t) => {
             const equipement = await Equipement.findByPk(id, {transaction: t});
-            if (!equipement) {
-                return {
-                    code: 404,
-                    message: "Equipement not found",
-                }
+            if (!equipement) return {
+                code: 404, error: "Equipement not found",
             }
             return await equipement.destroy({transaction: t});
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: "Equipement deleted"});
     } catch (error) {

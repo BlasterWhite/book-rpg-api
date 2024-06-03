@@ -107,7 +107,7 @@ exports.registerUser = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
     try {
         if (req.user.permission !== "admin") {
-            return res.status(403).json({message: "You don't have the rights for this action"});
+            return res.status(403).json({error: "You don't have the rights for this action"});
         }
         const users = await User.findAll({
             attributes: ["mail", "nom", "prenom", "permission", "creation_date"],
@@ -122,7 +122,7 @@ exports.getUserById = async (req, res) => {
     try {
         const {id} = req.params
         if (String(id) !== String(req.user.id) && req.user.permission !== "admin") {
-            return res.status(403).json({message: "You don't have the rights for this action"});
+            return res.status(403).json({error: "You don't have the rights for this action"});
         }
         const user = await User.findByPk(id, {
             attributes: ["mail", "nom", "prenom", "permission", "creation_date"],
@@ -138,7 +138,7 @@ exports.updateUser = async (req, res) => {
         const {id} = req.params;
 
         if (String(id) !== String(req.user.id) && req.user.permission !== "admin") {
-            return res.status(403).json({message: "You don't have the rights for this action"});
+            return res.status(403).json({error: "You don't have the rights for this action"});
         }
 
         const {mail, nom, prenom, password} = req.body;
@@ -148,7 +148,7 @@ exports.updateUser = async (req, res) => {
             if (!user) {
                 return {
                     code: 404,
-                    message: "User not found",
+                    error: "User not found",
                 }
             }
             return await user.update(
@@ -159,7 +159,7 @@ exports.updateUser = async (req, res) => {
             );
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: "User updated"});
     } catch (error) {
@@ -175,20 +175,20 @@ exports.deleteUser = async (req, res) => {
             if ((String(id) !== String(userFromToken.id)) && (userFromToken.permission !== "admin")) {
                 return {
                     code: 403,
-                    message: "You don't have the rights for this action",
+                    error: "You don't have the rights for this action",
                 }
             }
             const user = await User.findByPk(id, {transaction: t});
             if (!user) {
                 return {
                     code: 404,
-                    message: "User not found",
+                    error: "User not found",
                 }
             }
             return await user.destroy({transaction: t});
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: "User deleted"});
     } catch (error) {
@@ -200,7 +200,7 @@ exports.getAllAventures = async (req, res) => {
     try {
         const idUser = req.user.id;
         if (req.user.permission !== "admin") {
-            return res.status(403).json({message: "You don't have the rights for this action"});
+            return res.status(403).json({error: "You don't have the rights for this action"});
         }
         const aventures = await Aventure.findAll({
             where: {

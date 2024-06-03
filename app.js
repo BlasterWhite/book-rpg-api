@@ -47,12 +47,12 @@ app.use((req, res, next) => {
         } else {
             const token = req.headers["authorization"];
             if (!token) {
-                return res.status(401).json({message: "Token non fourni"});
+                return res.status(401).json({error: "Token non fourni"});
             }
 
             jwt.verify(token, secretKey, (err, decoded) => {
                 if (err) {
-                    return res.status(403).json({message: "Token invalide"});
+                    return res.status(403).json({error: "Token invalide"});
                 }
                 req.user = decoded;
                 next();
@@ -77,12 +77,12 @@ app.use((req, res, next) => {
     // le writer à tout les droit sauf /users ou il a la perm par défault
     if (req.user.permission === "writer") {
         if (req.path === "/users") {
-            return res.status(403).json({message: "Vous n'avez pas les droits pour cette action"});
+            return res.status(403).json({error: "Vous n'avez pas les droits pour cette action"});
         }
         return next();
     }
 
-    const body = {message: "Vous n'avez pas les droits pour cette action"};
+    const body = {error: "Vous n'avez pas les droits pour cette action"};
     const path = `/${req.path.split("/")[1]}`;
 
     switch (path) {

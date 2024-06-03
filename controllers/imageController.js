@@ -22,14 +22,14 @@ exports.createImage = async (req, res) => {
             const data = await response.json();
             if (data.error) {
                 return {
-                    error: data.error,
                     code: 400,
+                    error: data.error,
                 };
             }
             const image = await Image.create({image: data.image}, {transaction: t});
             return {
-                image,
                 code: 201,
+                image
             };
         });
         if (result.error) {
@@ -78,13 +78,13 @@ exports.deleteImage = async (req, res) => {
             if (!image) {
                 return {
                     code: 404,
-                    message: "Image not found",
+                    error: "Image not found",
                 };
             }
             return await image.destroy({transaction: t});
         });
         if (result.error) {
-            return res.status(result.code).json({error: result.message});
+            return res.status(result.code).json({error: result.error});
         }
         res.status(200).json({message: `Image ${id} deleted`});
     } catch (error) {

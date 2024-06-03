@@ -13,26 +13,20 @@ exports.createAventure = async (req, res) => {
     try {
         const {id_utilisateur, id_livre} = req.body;
         const result = await sequelize.transaction(async (t) => {
-            if (id_utilisateur == null) {
-                return {
-                    error: "id_utilisateur is required",
-                    code: 400,
-                };
+            if (id_utilisateur == null) return {
+                error: "id_utilisateur is required",
+                code: 400,
             }
 
-            if (id_livre == null) {
-                return {
-                    error: "id_livre is required",
-                    code: 400,
-                };
+            if (id_livre == null) return {
+                error: "id_livre is required",
+                code: 400,
             }
 
             const livre = await Livre.findByPk(id_livre, {transaction: t});
-            if (!livre) {
-                return {
-                    error: "id_livre not found",
-                    code: 404,
-                };
+            if (!livre) return {
+                error: "id_livre not found",
+                code: 404,
             }
 
             const section = await Section.findOne({
@@ -42,20 +36,16 @@ exports.createAventure = async (req, res) => {
                 },
                 transaction: t
             });
-            if (!section) {
-                return {
-                    error: "Section 1 for not found",
-                    code: 404,
-                };
+            if (!section) return {
+                error: "Section 1 for not found",
+                code: 404,
             }
 
             const id_personnage = livre.id_personnage_default;
             const personnage = await Personnage.findByPk(id_personnage, {transaction: t});
-            if (!personnage) {
-                return {
-                    error: "id_personnage not found",
-                    code: 404,
-                };
+            if (!personnage) return {
+                error: "id_personnage not found",
+                code: 404,
             }
 
             const personnageCreated = await Personnage.create({
@@ -117,7 +107,7 @@ exports.createAventure = async (req, res) => {
 exports.getAllAventure = async (req, res) => {
     try {
         if (req.user.permission !== "admin") {
-            return res.status(403).json({message: "You don't have the rights for this action"});
+            return res.status(403).json({error: "You don't have the rights for this action"});
         }
         const aventure = await Aventure.findAll();
         res.status(200).json(aventure);
