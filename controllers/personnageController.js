@@ -61,6 +61,13 @@ exports.getAllPersonnage = async (req, res) => {
                     through: {
                         attributes: [],
                     },
+                    include: [
+                        {
+                            model: Image,
+                            as: "image",
+                            attributes: ["image"],
+                        },
+                    ]
                 },
                 {
                     model: Equipement,
@@ -68,6 +75,13 @@ exports.getAllPersonnage = async (req, res) => {
                     through: {
                         attributes: [],
                     },
+                    include: [
+                        {
+                            model: Image,
+                            as: "image",
+                            attributes: ["image"],
+                        },
+                    ]
                 },
             ],
         });
@@ -88,6 +102,13 @@ exports.getOnePersonnage = async (req, res) => {
                     through: {
                         attributes: [],
                     },
+                    include: [
+                        {
+                            model: Image,
+                            as: "image",
+                            attributes: ["image"],
+                        },
+                    ]
                 },
                 {
                     model: Equipement,
@@ -95,6 +116,13 @@ exports.getOnePersonnage = async (req, res) => {
                     through: {
                         attributes: [],
                     },
+                    include: [
+                        {
+                            model: Image,
+                            as: "image",
+                            attributes: ["image"],
+                        },
+                    ]
                 },
             ],
         });
