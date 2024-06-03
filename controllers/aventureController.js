@@ -116,6 +116,9 @@ exports.createAventure = async (req, res) => {
 
 exports.getAllAventure = async (req, res) => {
     try {
+        if (req.user.permission !== "admin") {
+            return res.status(403).json({message: "You don't have the rights for this action"});
+        }
         const aventure = await Aventure.findAll();
         res.status(200).json(aventure);
     } catch (error) {
