@@ -126,7 +126,20 @@ exports.getAllAventure = async (req, res) => {
 exports.getOneAventure = async (req, res) => {
     try {
         const {id} = req.params;
-        const aventure = await Aventure.findByPk(id);
+        const aventure = await Aventure.findByPk(id, {
+            include: [
+                {
+                    model: Personnage,
+                    as: "personnage",
+                    attributes: Personnage.getAttributes(),
+                },
+                {
+                    model: Section,
+                    as: "section",
+                    attributes: Section.getAttributes(),
+                },
+            ],
+        });
         res.status(200).json(aventure);
     } catch (error) {
         res.status(500).json({error: error.message});
@@ -148,13 +161,13 @@ exports.updateAventure = async (req, res) => {
 
             await aventure.update({id_section_actuelle, statut}, {transaction: t});
             await PersonnageHistory.update({
-                    sections: Sequelize.fn('array_append', Sequelize.col('sections'), id_section_actuelle),
-                }, {
-                    where: {
-                        id_personnage: aventure.id_personnage,
-                    },
-                    transaction: t,
-                });
+                sections: Sequelize.fn('array_append', Sequelize.col('sections'), id_section_actuelle),
+            }, {
+                where: {
+                    id_personnage: aventure.id_personnage,
+                },
+                transaction: t,
+            });
             return aventure;
         });
 
