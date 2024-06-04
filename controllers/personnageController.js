@@ -173,7 +173,6 @@ exports.updatePersonnageFromEvents = async (req, res) => {
             }
 
             const id_personnage = id;
-
             const personnageHistory = await PersonnageHistory.findOrCreate({
                 where: {
                     id_personnage,
@@ -187,7 +186,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
             const personnageHistoryEvents = personnageHistory[0].dataValues.events;
 
             for (const event of events) {
-                const {which, id, type, operation, value} = event;
+                const {which, id, type, operation, value, bypass, override} = event;
 
                 let isEventAlreadyExists = false;
                 if (personnageHistoryEvents) {
@@ -206,7 +205,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                     } else if (operation === "remove") {
                         await personnage.decrement(type, {by: value, transaction: t});
                     }
-                } else if (which === "weapon") {
+                } else if (which === "weapon" && !bypass) {
                     const arme = await Arme.findByPk(value, {transaction: t});
                     if (!arme) {
                         return {
@@ -215,11 +214,21 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         };
                     }
                     if (operation === "add") {
+                        if (personnage.getArme() && personnage.getArme().length >= 2) {
+                            return {
+                                error: "You can't have more than 2 weapons",
+                                code: 400,
+                            };
+                        }
+                        if (override) {
+                            const armeToRemove = await Arme.findByPk(override, {transaction: t});
+                            await personnage.removeArme(armeToRemove, {transaction: t});
+                        }
                         await personnage.addArme(arme, {transaction: t});
                     } else if (operation === "remove") {
                         await personnage.removeArme(arme, {transaction: t});
                     }
-                } else if (which === "equipment") {
+                } else if (which === "equipment" && !bypass) {
                     const equipement = await Equipement.findByPk(value, {transaction: t});
                     if (!equipement) {
                         return {
@@ -228,6 +237,17 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         };
                     }
                     if (operation === "add") {
+                        if (personnage.getEquipement() && personnage.getEquipement().length >= 3) {
+                            return {
+                                error: "You can't have more than 3 equipments",
+                                code: 400,
+                            };
+                        }
+
+                        if (override) {
+                            const equipementToRemove = await Equipement.findByPk(override, {transaction: t});
+                            await personnage.removeEquipement(equipementToRemove, {transaction: t});
+                        }
                         await personnage.addEquipement(equipement, {transaction: t});
                     } else if (operation === "remove") {
                         await personnage.removeEquipement(equipement, {transaction: t});
