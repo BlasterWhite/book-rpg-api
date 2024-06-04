@@ -8,7 +8,7 @@ const {Personnage} = require("../models/personnageModels");
 exports.createSection = async (req, res) => {
     try {
         const {idLivre} = req.params;
-        const {numero_section, texte, id_image, type, resultat, destinations} = req.body;
+        const {texte, id_image, type, resultat, destinations} = req.body;
 
         const result = await sequelize.transaction(async (t) => {
             const [image, created] = await Image.findOrCreate({
@@ -21,17 +21,24 @@ exports.createSection = async (req, res) => {
                 transaction: t,
             });
 
-            const numero_sectionIsUndefined = (typeof numero_section === "undefined");
             const texteIsUndefined = (typeof texte === "undefined");
             const id_imageIsUndefined = (typeof id_image === "undefined");
             const typeIsUndefined = (typeof type === "undefined");
 
-            if (numero_sectionIsUndefined || texteIsUndefined || id_imageIsUndefined || typeIsUndefined) {
+            if (texteIsUndefined || id_imageIsUndefined || typeIsUndefined) {
                 return {
                     code: 400,
                     error: "Missing arguments for section"
                 }
             }
+
+            const highestNumeroSection = await Section.max("numero_section", {
+                where: {
+                    id_livre: idLivre,
+                },
+                transaction: t,
+            });
+            const numero_section = highestNumeroSection + 1;
 
             const section = await Section.create(
                 {
@@ -299,7 +306,6 @@ exports.updateSection = async (req, res) => {
     try {
         const {idLivre, idSection} = req.params;
         const {
-            numero_section,
             texte,
             id_image,
             type,
@@ -463,7 +469,6 @@ exports.updateSection = async (req, res) => {
                 await updatedSection.addEvents(res, {transaction: t});
             }
 
-            if (numero_section) updatedSection.numero_section = numero_section;
             if (texte) updatedSection.texte = texte;
             if (type) updatedSection.type = type;
 
