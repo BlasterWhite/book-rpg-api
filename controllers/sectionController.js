@@ -16,7 +16,7 @@ exports.createSection = async (req, res) => {
                     id: id_image,
                 },
                 defaults: {
-                    image: "https://picsum.photos/270/500",
+                    image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                 },
                 transaction: t,
             });
@@ -200,10 +200,8 @@ exports.createSection = async (req, res) => {
 };
 
 exports.getAllSections = async (req, res) => {
-    let transaction;
     try {
         const {idLivre} = req.params;
-        transaction = await sequelize.transaction();
         const sections = await Section.findAll({
             attributes: [
                 "id",
@@ -237,7 +235,6 @@ exports.getAllSections = async (req, res) => {
                     as: "events",
                 },
             ],
-            transaction
         });
         sections.forEach((section) => {
             if (section.resultat) {
@@ -250,10 +247,8 @@ exports.getAllSections = async (req, res) => {
                 }
             }
         });
-        await transaction.commit();
         res.status(200).json(sections);
     } catch (error) {
-        if (transaction) await transaction.rollback();
         res.status(500).json({error: error.message});
     }
 };

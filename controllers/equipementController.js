@@ -40,7 +40,7 @@ exports.createEquipement = async (req, res) => {
                 where: {
                     id: id_image,
                 }, defaults: {
-                    image: "https://picsum.photos/270/500",
+                    image: "https://api.iconify.design/material-symbols:shield-spark-outline-rounded.svg",
                 }, transaction: t,
             });
 
