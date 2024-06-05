@@ -6,6 +6,7 @@ const Section = require("../models/sectionModels");
 
 exports.getAllEnemy = async (req, res) => {
     try {
+        if (req.user.permission !== "admin") return res.status(403).json({error: "Forbidden"});
         const enemy = await Enemy.findAll({
             include: [
                 {
@@ -51,6 +52,7 @@ exports.getOneEnemy = async (req, res) => {
 exports.createEnemy = async (req, res) => {
     try {
         const {id_personnage, id_section} = req.body;
+        if (req.user.permission !== "admin") return res.status(403).json({error: "Forbidden"});
         const result = await sequelize.transaction(async (t) => {
             const personnage = await Personnage.findByPk(id_personnage, {transaction: t});
             if (!personnage) {
@@ -88,6 +90,7 @@ exports.updateEnemy = async (req, res) => {
     try {
         const {id} = req.params;
         const {id_section, personnage} = req.body;
+        if (req.user.permission !== "admin") return res.status(403).json({error: "Forbidden"});
         const result = await sequelize.transaction(async (t) => {
             if (!id_section) return {code: 400, error: "id_section is required"};
             if (!personnage) return {code: 400, error: "personnage is required"};
@@ -153,6 +156,7 @@ exports.updateEnemy = async (req, res) => {
 exports.deleteEnemy = async (req, res) => {
     try {
         const {id} = req.params;
+        if (req.user.permission !== "admin") return res.status(403).json({error: "Forbidden"});
         const result = await sequelize.transaction(async (t) => {
             const enemy = await Enemy.findByPk(id, {transaction: t});
             if (!enemy) {

@@ -11,6 +11,7 @@ const aventureRoutes = require("./routes/aventureRoutes");
 const levenschteinRoutes = require("./routes/levenschteinRoutes");
 const armeRoutes = require("./routes/armeRoutes");
 const equipementRoutes = require("./routes/equipementRoutes");
+const enemyRoutes = require("./routes/enemyRoute");
 
 const app = express();
 
@@ -66,23 +67,18 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    if (req.byPass || !req.user) { // le login
-        return next();
-    }
+    if (req.byPass || !req.user) return next(); // login
+    if (req.user.permission === "admin") return next();
 
-    if (req.user.permission === "admin") { // un admin à tous les droits
-        return next();
-    }
-
-    // le writer à tout les droit sauf /users ou il a la perm par défault
+    // All right except for /users
     if (req.user.permission === "writer") {
         if (req.path === "/users") {
-            return res.status(403).json({error: "Vous n'avez pas les droits pour cette action"});
+            return res.status(403).json({error: "You don't have the rights for this action"});
         }
         return next();
     }
 
-    const body = {error: "Vous n'avez pas les droits pour cette action"};
+    const body = {error: "You don't have the rights for this action"};
     const path = `/${req.path.split("/")[1]}`;
 
     switch (path) {
@@ -119,5 +115,6 @@ app.use("/aventures", aventureRoutes);
 app.use("/levenschtein", levenschteinRoutes);
 app.use("/armes", armeRoutes);
 app.use("/equipements", equipementRoutes);
+app.use("/enemies", enemyRoutes);
 
 module.exports = app;
