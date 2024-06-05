@@ -199,9 +199,6 @@ exports.deleteUser = async (req, res) => {
 exports.getAllAventures = async (req, res) => {
     try {
         const idUser = req.user.id;
-        if (req.user.permission !== "admin") {
-            return res.status(403).json({error: "You don't have the rights for this action"});
-        }
         const aventures = await Aventure.findAll({
             where: {
                 id_utilisateur: idUser,
