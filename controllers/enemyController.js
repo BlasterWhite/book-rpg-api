@@ -87,10 +87,13 @@ exports.createEnemy = async (req, res) => {
 exports.updateEnemy = async (req, res) => {
     try {
         const {id} = req.params;
-        const {id_personnage, id_section} = req.body;
+        const {id_section, personnage} = req.body;
         const result = await sequelize.transaction(async (t) => {
-            const personnage = await Personnage.findByPk(id_personnage, {transaction: t});
-            if (!personnage) {
+            if (!id_section) return {code: 400, error: "id_section is required"};
+            if (!personnage) return {code: 400, error: "personnage is required"};
+
+            const personnageInDB = await Personnage.findByPk(personnage.id, {transaction: t});
+            if (!personnageInDB) {
                 return {
                     code: 404,
                     error: "Personnage not found",
@@ -103,9 +106,30 @@ exports.updateEnemy = async (req, res) => {
                     error: "Section not found",
                 }
             }
+
+            if (personnage.nom) personnageInDB.nom = personnage.nom;
+            if (personnage.description) personnageInDB.description = personnage.description;
+            if (personnage.occupation) personnageInDB.occupation = personnage.occupation;
+            if (personnage.apparence) personnageInDB.apparence = personnage.apparence;
+            if (personnage.dexterite) personnageInDB.dexterite = personnage.dexterite;
+            if (personnage.endurance) personnageInDB.endurance = personnage.endurance;
+            if (personnage.psychisme) personnageInDB.psychisme = personnage.psychisme;
+            if (personnage.force) personnageInDB.force = personnage.force;
+            if (personnage.resistance) personnageInDB.resistance = personnage.resistance;
+            if (personnage.id_image) {
+                const image = await Image.findByPk(personnage.id_image, {transaction: t});
+                if (!image) {
+                    return {
+                        code: 404,
+                        error: "Image not found",
+                    }
+                }
+                personnageInDB.id_image = personnage.id_image;
+            }
+            await personnageInDB.save({transaction: t});
             return await Enemy.update(
                 {
-                    id_personnage,
+                    id_personnage: personnage.id,
                     id_section,
                 },
                 {
