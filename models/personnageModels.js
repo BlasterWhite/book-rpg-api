@@ -53,6 +53,11 @@ const Personnage = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        initialized: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+            defaultValue: false,
+        },
     },
     {
         schema: "bookrpg",
