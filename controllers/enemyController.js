@@ -64,7 +64,6 @@ exports.createEnemy = async (req, res) => {
                     error: "Section not found",
                 }
             }
-
             // on créer un personnage à partir des info de personnage
             if (!personnage.nom) return {code: 400, error: "nom is required"};
             if (!personnage.description) return {code: 400, error: "description is required"};
@@ -125,56 +124,47 @@ exports.updateEnemy = async (req, res) => {
         const {id_section, personnage} = req.body;
         if (req.user.permission !== "admin") return res.status(403).json({error: "Forbidden"});
         const result = await sequelize.transaction(async (t) => {
-            if (!id_section) return {code: 400, error: "id_section is required"};
-            if (!personnage) return {code: 400, error: "personnage is required"};
-
-            const personnageInDB = await Personnage.findByPk(personnage.id, {transaction: t});
-            if (!personnageInDB) {
-                return {
+            if (personnage) {
+                const personnageInDB = await Personnage.findByPk(personnage.id, {transaction: t});
+                if (!personnageInDB) return {
                     code: 404,
                     error: "Personnage not found",
                 }
-            }
-            const section = await Section.findByPk(id_section, {transaction: t});
-            if (!section) {
-                return {
+                const section = await Section.findByPk(id_section, {transaction: t});
+                if (!section) return {
                     code: 404,
                     error: "Section not found",
                 }
-            }
 
-            if (personnage.nom) personnageInDB.nom = personnage.nom;
-            if (personnage.description) personnageInDB.description = personnage.description;
-            if (personnage.occupation) personnageInDB.occupation = personnage.occupation;
-            if (personnage.apparence) personnageInDB.apparence = personnage.apparence;
-            if (personnage.dexterite) personnageInDB.dexterite = personnage.dexterite;
-            if (personnage.endurance) personnageInDB.endurance = personnage.endurance;
-            if (personnage.psychisme) personnageInDB.psychisme = personnage.psychisme;
-            if (personnage.force) personnageInDB.force = personnage.force;
-            if (personnage.resistance) personnageInDB.resistance = personnage.resistance;
-            if (personnage.id_image) {
-                const image = await Image.findByPk(personnage.id_image, {transaction: t});
-                if (!image) {
-                    return {
+                if (personnage.nom) personnageInDB.nom = personnage.nom;
+                if (personnage.description) personnageInDB.description = personnage.description;
+                if (personnage.occupation) personnageInDB.occupation = personnage.occupation;
+                if (personnage.apparence) personnageInDB.apparence = personnage.apparence;
+                if (personnage.dexterite) personnageInDB.dexterite = personnage.dexterite;
+                if (personnage.endurance) personnageInDB.endurance = personnage.endurance;
+                if (personnage.psychisme) personnageInDB.psychisme = personnage.psychisme;
+                if (personnage.force) personnageInDB.force = personnage.force;
+                if (personnage.resistance) personnageInDB.resistance = personnage.resistance;
+                if (personnage.id_image) {
+                    const image = await Image.findByPk(personnage.id_image, {transaction: t});
+                    if (!image) return {
                         code: 404,
                         error: "Image not found",
                     }
+                    personnageInDB.id_image = personnage.id_image;
                 }
-                personnageInDB.id_image = personnage.id_image;
+                await personnageInDB.save({transaction: t});
             }
-            await personnageInDB.save({transaction: t});
-            return await Enemy.update(
-                {
-                    id_personnage: personnage.id,
-                    id_section,
-                },
-                {
-                    where: {
-                        id,
-                    },
-                    transaction: t,
-                },
-            );
+
+            const enemy = await Enemy.findByPk(id, {transaction: t});
+            if (!enemy) return {
+                code: 404,
+                error: "Enemy not found",
+            }
+            if (id_section) enemy.id_section = id_section;
+            if (personnage && personnage.id) enemy.id_personnage = personnage.id;
+            await enemy.save({transaction: t});
+            return enemy;
         });
         if (result.code) {
             res.status(result.code).json({error: result.error});
