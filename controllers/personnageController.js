@@ -139,7 +139,7 @@ exports.updatePersonnage = async (req, res) => {
     try {
         const result = await sequelize.transaction(async (t) => {
             const {id} = req.params;
-            const {force, dexterite, endurance, psychisme, resistance} = req.body;
+            const {force, dexterite, endurance, psychisme, resistance, initialized} = req.body;
             const personnage = await Personnage.findByPk(id, {transaction: t});
             if (!personnage) {
                 return {
@@ -153,6 +153,7 @@ exports.updatePersonnage = async (req, res) => {
             if (endurance) personnage.endurance = endurance;
             if (psychisme) personnage.psychisme = psychisme;
             if (resistance) personnage.resistance = resistance;
+            if (initialized) personnage.initialized = initialized;
 
             await personnage.save({transaction: t});
             return personnage;
