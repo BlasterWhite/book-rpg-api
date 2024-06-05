@@ -125,6 +125,7 @@ const AssociationEquipementPersonnage = sequelize.define(
 Personnage.belongsToMany(Armes, {
     through: AssociationArmePersonnage,
     foreignKey: "id_personnage",
+    onDelete: "CASCADE",
 });
 Armes.belongsToMany(Personnage, {
     through: AssociationArmePersonnage,
@@ -134,6 +135,7 @@ Armes.belongsToMany(Personnage, {
 Personnage.belongsToMany(Equipement, {
     through: AssociationEquipementPersonnage,
     foreignKey: "id_personnage",
+    onDelete: "CASCADE",
 });
 Equipement.belongsToMany(Personnage, {
     through: AssociationEquipementPersonnage,
@@ -143,6 +145,7 @@ Equipement.belongsToMany(Personnage, {
 Personnage.hasOne(PersonnageHistory, {
     foreignKey: "id_personnage",
     as: "history",
+    onDelete: "CASCADE",
 });
 PersonnageHistory.belongsTo(Personnage, {
     foreignKey: "id_personnage",
