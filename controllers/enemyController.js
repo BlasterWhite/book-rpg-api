@@ -51,16 +51,12 @@ exports.getOneEnemy = async (req, res) => {
 
 exports.createEnemy = async (req, res) => {
     try {
-        const {id_personnage, id_section} = req.body;
+        const {id_section, personnage} = req.body;
         if (req.user.permission !== "admin") return res.status(403).json({error: "Forbidden"});
+        if (!id_section) return res.status(400).json({error: "id_section is required"});
+        if (!personnage) return res.status(400).json({error: "personnage is required"});
+
         const result = await sequelize.transaction(async (t) => {
-            const personnage = await Personnage.findByPk(id_personnage, {transaction: t});
-            if (!personnage) {
-                return {
-                    code: 404,
-                    error: "Personnage not found",
-                }
-            }
             const section = await Section.findByPk(id_section, {transaction: t});
             if (!section) {
                 return {
@@ -68,9 +64,46 @@ exports.createEnemy = async (req, res) => {
                     error: "Section not found",
                 }
             }
+
+            // on créer un personnage à partir des info de personnage
+            if (!personnage.nom) return {code: 400, error: "nom is required"};
+            if (!personnage.description) return {code: 400, error: "description is required"};
+            if (!personnage.occupation) return {code: 400, error: "occupation is required"};
+            if (!personnage.apparence) return {code: 400, error: "apparence is required"};
+            if (!personnage.dexterite) return {code: 400, error: "dexterite is required"};
+            if (!personnage.endurance) return {code: 400, error: "endurance is required"};
+            if (!personnage.psychisme) return {code: 400, error: "psychisme is required"};
+            if (!personnage.force) return {code: 400, error: "force is required"};
+            if (!personnage.resistance) return {code: 400, error: "resistance is required"};
+            if (!personnage.id_image) return {code: 400, error: "id_image is required"};
+
+            const personnageImage = await Image.findByPk(personnage.id_image, {transaction: t});
+            if (!personnageImage) {
+                return {
+                    code: 404,
+                    error: "Image not found",
+                }
+            }
+
+            const personnageInDB = await Personnage.create(
+                {
+                    nom: personnage.nom,
+                    description: personnage.description,
+                    occupation: personnage.occupation,
+                    apparence: personnage.apparence,
+                    dexterite: personnage.dexterite,
+                    endurance: personnage.endurance,
+                    psychisme: personnage.psychisme,
+                    force: personnage.force,
+                    resistance: personnage.resistance,
+                    id_image: personnage.id_image,
+                },
+                {transaction: t},
+            );
+
             return await Enemy.create(
                 {
-                    id_personnage,
+                    id_personnage: personnageInDB.id,
                     id_section,
                 },
                 {transaction: t},
