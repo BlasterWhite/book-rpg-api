@@ -25,7 +25,7 @@ exports.createPersonnage = async (req, res) => {
                     transaction: t
                 },
             );
-            armeParDefaut = await Arme.findOrCreate({
+            const [armeParDefaut, created] = await Arme.findOrCreate({
                 where: {
                     titre: "Poing",
                 },
