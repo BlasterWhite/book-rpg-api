@@ -5,7 +5,7 @@ const Livre = require("../models/livreModels");
 const Section = require("../models/sectionModels");
 const Image = require("../models/imageModels");
 const Arme = require("../models/armeModels");
-const {Personnage} = require("../models/personnageModels");
+const {Personnage, AssociationEquipementPersonnage, AssociationArmePersonnage} = require("../models/personnageModels");
 const PersonnageHistory = require("../models/PersonnageHistoryModel");
 const {Sequelize} = require("sequelize");
 
@@ -183,6 +183,9 @@ exports.deleteAventure = async (req, res) => {
             if (!aventure) {
                 return {error: "Aventure not found", code: 404};
             }
+
+            await AssociationArmePersonnage.destroy({where: {id_personnage: aventure.id_personnage}, transaction: t});
+            await AssociationEquipementPersonnage.destroy({where: {id_personnage: aventure.id_personnage}, transaction: t});
             await Personnage.destroy({where: {id: aventure.id_personnage}, transaction: t});
             await PersonnageHistory.destroy({where: {id_personnage: aventure.id_personnage}, transaction: t});
             await aventure.destroy({transaction: t});
