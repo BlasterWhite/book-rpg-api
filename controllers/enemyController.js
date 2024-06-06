@@ -13,6 +13,12 @@ exports.getAllEnemy = async (req, res) => {
                 {
                     model: Personnage,
                     as: "personnage",
+                    include: [
+                        {
+                            model: Image,
+                            as: "image",
+                        },
+                    ],
                 },
                 {
                     model: Section,
@@ -37,6 +43,12 @@ exports.getOneEnemy = async (req, res) => {
                 {
                     model: Personnage,
                     as: "personnage",
+                    include: [
+                        {
+                            model: Image,
+                            as: "image",
+                        },
+                    ],
                 },
                 {
                     model: Section,
