@@ -6,6 +6,7 @@ const User = require("../models/userModels");
 const Aventure = require("../models/aventureModels");
 const {Personnage} = require("../models/personnageModels");
 const Section = require("../models/sectionModels");
+const Favoris = require("../models/favorisModels");
 
 exports.loginUser = async (req, res) => {
     try {
@@ -182,6 +183,13 @@ exports.deleteUser = async (req, res) => {
                     error: "User not found",
                 }
             }
+
+            await Favoris.destroy({
+                where: {
+                    id_utilisateur: id,
+                },
+                transaction: t,
+            });
             return await user.destroy({transaction: t});
         });
         if (result.error) {
