@@ -8,9 +8,16 @@ const {Personnage} = require("../models/personnageModels");
 exports.createSection = async (req, res) => {
     try {
         const {idLivre} = req.params;
-        const {texte, id_image, type, resultat, destinations} = req.body;
+        const {id_image} = req.body;
 
         const result = await sequelize.transaction(async (t) => {
+            const id_imageIsUndefined = (typeof id_image === "undefined");
+
+            if (id_imageIsUndefined) return {
+                code: 400,
+                error: "Missing arguments for section"
+            }
+
             const [image, created] = await Image.findOrCreate({
                 where: {
                     id: id_image,
@@ -21,17 +28,6 @@ exports.createSection = async (req, res) => {
                 transaction: t,
             });
 
-            const texteIsUndefined = (typeof texte === "undefined");
-            const id_imageIsUndefined = (typeof id_image === "undefined");
-            const typeIsUndefined = (typeof type === "undefined");
-
-            if (texteIsUndefined || id_imageIsUndefined || typeIsUndefined) {
-                return {
-                    code: 400,
-                    error: "Missing arguments for section"
-                }
-            }
-
             const highestNumeroSection = await Section.max("numero_section", {
                 where: {
                     id_livre: idLivre,
@@ -39,138 +35,18 @@ exports.createSection = async (req, res) => {
                 transaction: t,
             });
             const numero_section = highestNumeroSection + 1;
-
             const section = await Section.create(
                 {
                     id_livre: Number(idLivre),
                     numero_section,
-                    texte,
+                    texte: "New Section",
                     id_image: image.id,
-                    type,
-                    resultat,
+                    type: "none",
                 },
                 {
-                    include: [
-                        {
-                            model: Resultat,
-                            as: "resultat",
-                        },
-                    ],
                     transaction: t,
                 },
             );
-
-            if (type === "none" || type === "termine") {
-                if (!destinations || !Array.isArray(destinations) || destinations.length > 0) return {
-                    code: 400,
-                    error: "Destination must be a list of section id ! "
-                }
-            } else if (type === "des" || type === "combat" || type === "enigme") {
-                if (typeof resultat === "undefined" && typeof destinations === "undefined") {
-                    return {
-                        code: 400,
-                        error: "Missing arguments for section"
-                    }
-                }
-
-                const conditionIsUndefined = (typeof resultat.condition === "undefined");
-                const typeConditionIsUndefined = (typeof resultat.type_condition === "undefined");
-                const gagneIsUndefined = (typeof resultat.gagne === "undefined");
-                const perdIsUndefined = (typeof resultat.perd === "undefined");
-
-                if (conditionIsUndefined || typeConditionIsUndefined || gagneIsUndefined || perdIsUndefined) {
-                    return {
-                        code: 400,
-                        error: "Missing arguments for resultat"
-                    }
-                }
-
-
-                if (!destinations || !Array.isArray(destinations) || destinations.length !== 2) return {
-                    code: 400,
-                    error: "Destination must be a list of section id equals to 2 ! "
-                }
-
-                if (!destinations.includes(resultat.gagne) || !destinations.includes(resultat.perd)) {
-                    return {
-                        code: 400,
-                        error: "resultat.gagne and resultat.perd must be in destination"
-                    }
-                }
-
-                if ((section.id === resultat.gagne) || (section.id === resultat.perd) || destinations.includes(section.id)) {
-                    return {
-                        code: 400,
-                        error: "Section id must not be in destination or in resultat.gagne or in resultat.perd"
-                    }
-                }
-
-                for (const destination of destinations) {
-                    const search = await Section.findOne({
-                        where: {
-                            id_livre: idLivre,
-                            id: destination,
-                        },
-                        transaction: t,
-                    });
-                    if (!search) {
-                        return {
-                            code: 400,
-                            error: "Destination not found"
-                        }
-                    }
-                    section.addSections(search, {transaction: t});
-                }
-
-                const sectionGagne = await Section.findByPk(resultat.gagne, {transaction: t});
-                if (!sectionGagne) return {
-                    code: 404,
-                    error: "Destination gagne not found"
-                }
-
-                const sectionPerd = await Section.findByPk(resultat.perd, {transaction: t});
-                if (!sectionPerd) return {
-                    code: 404,
-                    error: "Destination perd not found"
-                }
-            } else if (type === "choix") {
-                if (typeof destinations === "undefined") return {
-                    code: 400,
-                    error: "Missing arguments for section"
-                }
-
-                if (!destinations || !Array.isArray(destinations) || destinations.length === 0) return {
-                    code: 400,
-                    error: "Destination must be a list of section id !"
-                }
-
-                if (destinations.includes(section.id)) return {
-                    code: 400,
-                    error: "Section id must not be in destination"
-                }
-
-                for (const destination of destinations) {
-                    const search = await Section.findOne({
-                        where: {
-                            id_livre: idLivre,
-                            id: destination,
-                        },
-                        transaction: t,
-                    });
-                    if (!search) {
-                        return {
-                            code: 404,
-                            error: "Destination not found"
-                        }
-                    }
-                    section.addSections(search, {transaction: t});
-                }
-            } else {
-                return {
-                    code: 400,
-                    error: "Wrong type",
-                }
-            }
 
             return await Section.findOne({
                 where: {
@@ -419,15 +295,15 @@ exports.updateSection = async (req, res) => {
                     }, {transaction: t});
                     break;
                 case "combat":
-                    if (typeof resultat.type_condition !== "number") return {
+                    if (resultat.type_condition !== "id") return {
                         code: 400,
-                        error: "Type condition must be integer",
+                        error: "Type condition must be id to reference a personnage",
                     }
 
-                    resultat.condition = resultat.condition.toLowerCase();
-                    if (!Personnage.ALL_ATTRIBUTS.includes(resultat.condition)) return {
-                        code: 400,
-                        error: "Type condition must be in personnage attributs",
+                    const enemyPersonnage = await Personnage.findByPk(resultat.condition, {transaction: t});
+                    if (!enemyPersonnage) return {
+                        code: 404,
+                        error: "Enemy not found",
                     }
 
                     if (updatedSection.resultat) await updatedSection.resultat.destroy({transaction: t});
@@ -436,7 +312,7 @@ exports.updateSection = async (req, res) => {
                     await updatedSection.createResultat({
                         id_section: updatedSection.id,
                         type_condition: resultat.type_condition,
-                        condition: resultat.condition.toString(),
+                        condition: resultat.condition,
                         gagne: resultat.gagne,
                         perd: resultat.perd,
                     }, {transaction: t});
