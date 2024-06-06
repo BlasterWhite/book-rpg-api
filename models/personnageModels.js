@@ -151,6 +151,16 @@ PersonnageHistory.belongsTo(Personnage, {
     foreignKey: "id_personnage",
     as: "personnage",
 });
+Personnage.hasOne(Image, {
+    foreignKey: "id",
+    sourceKey: "id_image",
+    as: "image",
+});
+Image.belongsTo(Personnage, {
+    foreignKey: "id",
+    targetKey: "id_image",
+    as: "personnage",
+});
 
 Personnage.getAttributes = () => {
     return [
