@@ -3,6 +3,7 @@ const sequelize = require("../db/db");
 const Enemy = require("../models/enemyModel");
 const {Personnage} = require("../models/personnageModels");
 const Section = require("../models/sectionModels");
+const Image = require("../models/imageModels");
 
 exports.getAllEnemy = async (req, res) => {
     try {
