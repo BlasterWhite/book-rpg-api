@@ -4,6 +4,7 @@ const Section = require("../models/sectionModels");
 const Image = require("../models/imageModels");
 const Event = require("../models/eventModels");
 const {Personnage} = require("../models/personnageModels");
+const Enemy = require("../models/enemyModel");
 
 exports.createSection = async (req, res) => {
     try {
@@ -172,6 +173,30 @@ exports.getSectionById = async (req, res) => {
                 section.resultat.condition = JSON.parse(section.resultat.condition);
             }
         }
+
+        // on recherche si y a un enemi dans la section
+        const enemy = await Enemy.findOne({
+            where: {
+                id_section: idSection,
+            },
+            include: [
+                {
+                    model: Personnage,
+                    as: "personnage",
+                    include: [
+                        {
+                            model: Image,
+                            as: "image",
+                        },
+                    ],
+                },
+            ],
+        });
+
+        if (enemy) {
+            section.enemy = enemy;
+        }
+
         res.status(200).json(section);
     } catch (error) {
         res.status(500).json({error: error.message});
