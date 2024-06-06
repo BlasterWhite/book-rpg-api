@@ -174,7 +174,7 @@ exports.getSectionById = async (req, res) => {
             }
         }
 
-        // on recherche si y a un enemi dans la section
+        console.log(idSection)
         const enemy = await Enemy.findOne({
             where: {
                 id_section: idSection,
@@ -193,9 +193,7 @@ exports.getSectionById = async (req, res) => {
             ],
         });
 
-        if (enemy) {
-            section.enemy = enemy;
-        }
+        if (enemy) section.setDataValue('enemy', enemy);
 
         res.status(200).json(section);
     } catch (error) {
