@@ -83,6 +83,10 @@ exports.getAllPersonnage = async (req, res) => {
                         },
                     ]
                 },
+                {
+                    model: Image,
+                    as: "image",
+                }
             ],
         });
         res.status(200).json(personnages);
@@ -124,6 +128,10 @@ exports.getOnePersonnage = async (req, res) => {
                         },
                     ]
                 },
+                {
+                    model: Image,
+                    as: "image",
+                }
             ],
         });
         if (!personnage) {
