@@ -184,12 +184,6 @@ exports.deleteUser = async (req, res) => {
                 }
             }
 
-            await Favoris.destroy({
-                where: {
-                    id_utilisateur: id,
-                },
-                transaction: t,
-            });
             return await user.destroy({transaction: t});
         });
         if (result.error) {
