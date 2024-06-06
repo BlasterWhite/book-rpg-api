@@ -43,7 +43,7 @@ Favoris.belongsTo(User, {
 User.hasMany(Favoris, {
     foreignKey: "id_utilisateur",
     as: "favoris",
-    onDelete: "CASCADE",
+    onDelete: "cascade",
 });
 
 Favoris.belongsTo(Livre, {
