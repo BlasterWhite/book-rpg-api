@@ -142,21 +142,18 @@ exports.updateUser = async (req, res) => {
         }
 
         const {mail, nom, prenom, password} = req.body;
-        const mot_de_passe_crypte = await bcrypt.hash(password, 10);
         const result = await sequelize.transaction(async t => {
             const user = await User.findByPk(id, {transaction: t});
-            if (!user) {
-                return {
-                    code: 404,
-                    error: "User not found",
-                }
+            if (!user) return {
+                code: 404,
+                error: "User not found",
             }
-            return await user.update(
-                {mail, nom, prenom, mot_de_passe: mot_de_passe_crypte},
-                {
-                    transaction: t,
-                },
-            );
+
+            if (mail) user.mail = mail;
+            if (nom) user.nom = nom;
+            if (prenom) user.prenom = prenom;
+            if (password) user.mot_de_passe = await bcrypt.hash(password, 10);
+            return await user.save({transaction: t});
         });
         if (result.error) {
             return res.status(result.code).json({error: result.error});
