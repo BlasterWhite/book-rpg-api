@@ -300,36 +300,17 @@ exports.updatePersonnageFromEvents = async (req, res) => {
 exports.deletePersonnage = async (req, res) => {
     try {
         const {id} = req.params;
-        await sequelize.transaction(async (t) => {
-            await AssociationArmePersonnage.destroy({
-                where: {
-                    id_personnage: id,
-                },
-                transaction: t,
-            });
-
-            await AssociationEquipementPersonnage.destroy({
-                where: {
-                    id_personnage: id,
-                },
-                transaction: t,
-            });
-
-            await PersonnageHistory.destroy({
-                where: {
-                    id_personnage: id,
-                },
-                transaction: t,
-            });
-
-            await Personnage.destroy({
-                where: {
-                    id,
-                },
-                transaction: t,
-            });
-            return personnage;
+        const result = await sequelize.transaction(async (t) => {
+            const personnage = Personnage.findByPk(id, {transaction: t});
+            if (!personnage) return {
+                code: 404,
+                error: "Personnage not found"
+            }
+            return await personnage.destroy({transaction: t});
         });
+        if (result.error) {
+            return res.status(result.code).json({error: result.error});
+        }
         res.status(200).json({message: "Personnage deleted"});
     } catch (error) {
         res.status(500).json({error: error.message});
