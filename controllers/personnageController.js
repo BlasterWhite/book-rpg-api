@@ -224,7 +224,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         };
                     }
                     if (operation === "add") {
-                        if (personnage.getArme() && personnage.getArme().length >= 2) {
+                        if (personnage.getArmes() && personnage.getArmes().length >= 2) {
                             return {
                                 error: "You can't have more than 2 weapons",
                                 code: 400,
@@ -247,7 +247,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         };
                     }
                     if (operation === "add") {
-                        if (personnage.getEquipement() && personnage.getEquipement().length >= 3) {
+                        if (personnage.getEquipements() && personnage.getEquipements().length >= 3) {
                             return {
                                 error: "You can't have more than 3 equipments",
                                 code: 400,
