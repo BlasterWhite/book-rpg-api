@@ -264,6 +264,7 @@ exports.updateSection = async (req, res) => {
                         code: 404, error: "Enemy not found",
                     }
                     enemyPersonnage.id_section = updatedSection.id;
+                    enemyPersonnage.save({transaction: t});
 
                     console.log("Creating enemy", updatedSection.resultat)
                     if (updatedSection.resultat) {
