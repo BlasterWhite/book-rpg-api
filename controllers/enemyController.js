@@ -3,6 +3,7 @@ const sequelize = require("../db/db");
 const Enemy = require("../models/enemyModel");
 const {Personnage} = require("../models/personnageModels");
 const Section = require("../models/sectionModels");
+const Image = require("../models/imageModels");
 
 exports.getAllEnemy = async (req, res) => {
     try {
@@ -12,6 +13,12 @@ exports.getAllEnemy = async (req, res) => {
                 {
                     model: Personnage,
                     as: "personnage",
+                    include: [
+                        {
+                            model: Image,
+                            as: "image",
+                        },
+                    ],
                 },
                 {
                     model: Section,
@@ -36,6 +43,12 @@ exports.getOneEnemy = async (req, res) => {
                 {
                     model: Personnage,
                     as: "personnage",
+                    include: [
+                        {
+                            model: Image,
+                            as: "image",
+                        },
+                    ],
                 },
                 {
                     model: Section,
