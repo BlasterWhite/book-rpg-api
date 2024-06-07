@@ -2,7 +2,7 @@ const sequelize = require("../db/db");
 
 const Enemy = require("../models/enemyModel");
 const {Personnage} = require("../models/personnageModels");
-const { Section } = require("../models/sectionModels");
+const {Section} = require("../models/sectionModels");
 const Image = require("../models/imageModels");
 
 exports.getAllEnemy = async (req, res) => {
@@ -66,16 +66,9 @@ exports.createEnemy = async (req, res) => {
     try {
         const {id_section, personnage} = req.body;
         if (req.user.permission !== "admin") return res.status(403).json({error: "Forbidden"});
-        if (!id_section) return res.status(400).json({error: "id_section is required"});
         if (!personnage) return res.status(400).json({error: "personnage is required"});
 
         const result = await sequelize.transaction(async (t) => {
-            const section = await Section.findByPk(id_section, {transaction: t});
-            if (!section) return {
-                code: 404,
-                error: "Section not found",
-            }
-
             if (!personnage.nom) return {code: 400, error: "nom is required"};
             if (!personnage.description) return {code: 400, error: "description is required"};
             if (!personnage.occupation) return {code: 400, error: "occupation is required"};
@@ -116,7 +109,6 @@ exports.createEnemy = async (req, res) => {
             return await Enemy.create(
                 {
                     id_personnage: personnageInDB.id,
-                    id_section,
                 },
                 {transaction: t},
             );
@@ -142,11 +134,6 @@ exports.updateEnemy = async (req, res) => {
                 if (!personnageInDB) return {
                     code: 404,
                     error: "Personnage not found",
-                }
-                const section = await Section.findByPk(id_section, {transaction: t});
-                if (!section) return {
-                    code: 404,
-                    error: "Section not found",
                 }
 
                 if (personnage.nom) personnageInDB.nom = personnage.nom;
@@ -174,7 +161,15 @@ exports.updateEnemy = async (req, res) => {
                 code: 404,
                 error: "Enemy not found",
             }
-            if (id_section) enemy.id_section = id_section;
+
+            if (id_section) {
+                const section = await Section.findByPk(id_section, {transaction: t});
+                if (!section) return {
+                    code: 404,
+                    error: "Section not found",
+                }
+                enemy.id_section = id_section;
+            }
             if (personnage && personnage.id) enemy.id_personnage = personnage.id;
             await enemy.save({transaction: t});
             return enemy;

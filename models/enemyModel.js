@@ -16,7 +16,7 @@ const Enemy = sequelize.define(
         },
         id_section: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             references: {
                 model: Section,
                 key: "id",

@@ -251,20 +251,16 @@ exports.updateSection = async (req, res) => {
                         code: 400, error: "Type condition must be id to reference a personnage",
                     }
 
-                    console.log("Searching for enemy")
-                    console.log(resultat)
-                    const enemyPersonnage = await Personnage.findByPk(resultat.condition, {
-                        transaction: t, include: [
-                            {
-                                model: Image, as: "image",
-                            },
-                        ]
+                    console.log("Searching for enemy", resultat.condition)
+                    const enemyTableRow = await Enemy.findOne({
+                        where: {
+                            id_personnage: resultat.condition,
+                        }, transaction: t,
                     });
-                    if (!enemyPersonnage) return {
+                    if (!enemyTableRow) return {
                         code: 404, error: "Enemy not found",
                     }
-                    enemyPersonnage.id_section = updatedSection.id;
-                    enemyPersonnage.save({transaction: t});
+                    await enemyTableRow.update({id_section: idSection}, {transaction: t});
 
                     console.log("Creating enemy", updatedSection.resultat)
                     if (updatedSection.resultat) {
