@@ -1,4 +1,4 @@
-const {Personnage} = require("../models/personnageModels");
+const {Personnage, AssociationArmePersonnage, AssociationEquipementPersonnage} = require("../models/personnageModels");
 const Arme = require("../models/armeModels");
 const Image = require("../models/imageModels");
 const Aventure = require("../models/aventureModels");
@@ -133,7 +133,20 @@ exports.updatePersonnageFromEvents = async (req, res) => {
             const {id} = req.params;
             const {events} = req.body;
 
-            const personnage = await Personnage.findByPk(id, {transaction: t});
+            const personnage = await Personnage.findByPk(id, {
+                transaction: t, include: [
+                    {
+                        model: Arme, as: "armes", through: {
+                            attributes: [],
+                        }
+                    },
+                    {
+                        model: Equipement, as: "equipements", through: {
+                            attributes: [],
+                        }
+                    },
+                ]
+            });
             if (!personnage) {
                 return {
                     error: "Personnage not found", code: 404,
@@ -151,6 +164,9 @@ exports.updatePersonnageFromEvents = async (req, res) => {
 
             const personnageHistoryEvents = personnageHistory[0].dataValues.events;
 
+            let nbArmes = personnage.armes.length;
+            let nbEquipement = personnage.equipements.length;
+
             for (const event of events) {
                 const {which, id, type, operation, value, bypass, override} = event;
 
@@ -164,7 +180,6 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                     }
                 }
                 if (isEventAlreadyExists) continue; // on ne traite pas les événements déjà traités
-
                 if (which === "attribute") {
                     if (operation === "add") {
                         await personnage.increment(type, {by: value, transaction: t});
@@ -179,7 +194,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         };
                     }
                     if (operation === "add") {
-                        if (personnage.getArmes() && personnage.getArmes().length >= 2) {
+                        if (nbArmes && nbArmes >= 2) {
                             return {
                                 error: "You can't have more than 2 weapons", code: 400,
                             };
@@ -187,10 +202,13 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         if (override) {
                             const armeToRemove = await Arme.findByPk(override, {transaction: t});
                             await personnage.removeArme(armeToRemove, {transaction: t});
+                            nbArmes--;
                         }
                         await personnage.addArme(arme, {transaction: t});
+                        nbArmes++;
                     } else if (operation === "remove") {
                         await personnage.removeArme(arme, {transaction: t});
+                        nbArmes--;
                     }
                 } else if (which === "equipment" && !bypass) {
                     const equipement = await Equipement.findByPk(value, {transaction: t});
@@ -200,7 +218,7 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         };
                     }
                     if (operation === "add") {
-                        if (personnage.getEquipements() && personnage.getEquipements().length >= 3) {
+                        if (nbEquipement && nbEquipement >= 3) {
                             return {
                                 error: "You can't have more than 3 equipments", code: 400,
                             };
@@ -209,10 +227,13 @@ exports.updatePersonnageFromEvents = async (req, res) => {
                         if (override) {
                             const equipementToRemove = await Equipement.findByPk(override, {transaction: t});
                             await personnage.removeEquipement(equipementToRemove, {transaction: t});
+                            nbEquipement--;
                         }
                         await personnage.addEquipement(equipement, {transaction: t});
+                        nbEquipement++;
                     } else if (operation === "remove") {
                         await personnage.removeEquipement(equipement, {transaction: t});
+                        nbEquipement--
                     }
                 } else {
                     return {
