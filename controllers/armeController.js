@@ -89,18 +89,21 @@ exports.updateArme = async (req, res) => {
                 code: 404,
                 error: "Image not found",
             }
-            return await arme.update(
-                {
-                    titre,
-                    description,
-                    id_image,
-                    degats,
-                    durabilite,
-                },
-                {
-                    transaction: t,
-                },
-            );
+
+            if (titre) arme.titre = titre;
+            if (description) arme.description = description;
+            if (degats) arme.degats = degats;
+            if (durabilite) arme.durabilite = durabilite;
+            if (id_image) {
+                const image = await Image.findByPk(id_image, {transaction: t});
+                if (!image) return {
+                    code: 404,
+                    error: "Image not found",
+                }
+                arme.id_image = id_image;
+            }
+
+            return await arme.save({transaction: t});
         });
         if (result.error) {
             return res.status(result.code).json({error: result.error});

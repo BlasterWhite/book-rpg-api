@@ -163,7 +163,7 @@ exports.updateUser = async (req, res) => {
     } catch (error) {
         res.status(500).json({error: error.message});
     }
-};
+};u
 
 exports.deleteUser = async (req, res) => {
     try {

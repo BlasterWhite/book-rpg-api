@@ -42,10 +42,14 @@ exports.updatePersonnageHistory = async (req, res) => {
                 },
                 transaction: t,
             });
+            if (!personnageHistory) return {
+                code: 404,
+                error: "Personnage history not found",
+            }
             if (events) personnageHistory.dataValues.events.push(...events)
             if (sections) personnageHistory.dataValues.sections.push(...sections);
 
-            await PersonnageHistory.update({
+            return await PersonnageHistory.update({
                 events: personnageHistory.dataValues.events,
                 sections: personnageHistory.dataValues.sections,
             }, {
@@ -54,14 +58,11 @@ exports.updatePersonnageHistory = async (req, res) => {
                 },
                 transaction: t,
             });
-            return await PersonnageHistory.findOne({
-                where: {
-                    id_personnage: id,
-                },
-                transaction: t,
-            });
         });
-        res.status(204).json(result);
+        if (result.error) {
+            return res.status(result.code).json({error: result.error});
+        }
+        res.status(204).json({message: "Personnage history updated successfully"});
     } catch (error) {
         res.status(500).json({error: error.message});
     }
