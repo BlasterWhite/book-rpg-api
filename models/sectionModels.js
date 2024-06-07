@@ -117,4 +117,4 @@ Section.getAttributes = () => {
   return ["id", "id_livre", "numero_section", "texte", "id_image", "type"];
 };
 
-module.exports = Section;
+module.exports = {Section, AssociationLiaisonSection};

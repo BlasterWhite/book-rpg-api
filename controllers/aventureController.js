@@ -2,7 +2,7 @@ const sequelize = require("../db/db");
 
 const Aventure = require("../models/aventureModels");
 const Livre = require("../models/livreModels");
-const Section = require("../models/sectionModels");
+const { Section } = require("../models/sectionModels");
 const Image = require("../models/imageModels");
 const Arme = require("../models/armeModels");
 const {Personnage, AssociationEquipementPersonnage, AssociationArmePersonnage} = require("../models/personnageModels");

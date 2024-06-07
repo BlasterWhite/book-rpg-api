@@ -1,6 +1,6 @@
 const {DataTypes} = require("sequelize");
 const sequelize = require("../db/db")
-const Section = require("./sectionModels");
+const { Section } = require("./sectionModels");
 const {Personnage} = require("./personnageModels");
 
 const Enemy = sequelize.define(

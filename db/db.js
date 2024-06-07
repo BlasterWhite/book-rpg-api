@@ -15,10 +15,10 @@ const sequelize = new Sequelize(
 
         },
         pool: {
-            max: 1,
-            min: 0,
-            acquire: 30000,
-            idle: 10000,
+            max: 10, // maximum de connexions dans le pool
+            min: 0,  // minimum de connexions dans le pool
+            acquire: 30000, // temps maximum en ms pour essayer d'acquérir une connexion avant de déclencher une erreur
+            idle: 10000 // temps maximum en ms qu'une connexion peut rester inactive avant d'être libérée
         }
     },
 );

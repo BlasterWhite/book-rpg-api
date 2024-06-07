@@ -2,7 +2,7 @@ const {DataTypes} = require("sequelize");
 const sequelize = require("../db/db");
 const User = require("./userModels");
 const Livre = require("./livreModels");
-const Section = require("./sectionModels");
+const { Section } = require("./sectionModels");
 const {Personnage} = require("./personnageModels");
 
 const Aventure = sequelize.define(

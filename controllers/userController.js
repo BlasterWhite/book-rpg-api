@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/userModels");
 const Aventure = require("../models/aventureModels");
 const {Personnage} = require("../models/personnageModels");
-const Section = require("../models/sectionModels");
+const { Section } = require("../models/sectionModels");
 const Favoris = require("../models/favorisModels");
 
 exports.loginUser = async (req, res) => {
